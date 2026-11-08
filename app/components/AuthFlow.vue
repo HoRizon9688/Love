@@ -213,7 +213,7 @@ async function resendEmail() {
           <button class="auth-submit" type="button" @click="emit('complete')">先进入空间</button>
         </div>
         <form v-else class="auth-form" @submit.prevent="submitJoin">
-          <label><span>专属邀请码</span><div><Link2 :size="18" /><input v-model="inviteCode" maxlength="12" placeholder="例如 LOVE-7286"></div></label>
+          <label><span>专属邀请码</span><div><Link2 :size="18" /><input v-model="inviteCode" maxlength="32" placeholder="粘贴伴侣发来的邀请码"></div></label>
           <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
           <button class="auth-submit" type="submit" :disabled="loading">确认绑定</button>
         </form>
@@ -504,6 +504,8 @@ async function resendEmail() {
 .invite-result p { margin: 0 0 20px; color: #89818f; font-size: 12px; }
 .code-box { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 65px; border: 1px dashed #bba9d6; border-radius: 17px; background: #f6f2fb; color: #71569a; cursor: pointer; }
 .code-box strong { font-size: 22px; letter-spacing: .12em; }
+.invite-result .code-box strong { min-width: 0; overflow-wrap: anywhere; }
+.invite-result .code-box svg { flex-shrink: 0; }
 .invite-result small { display: block; margin: 9px 0 16px; color: #9991a2; font-size: 10px; }
 .spin { animation: spin 1s linear infinite; }
 .confirmation-card { text-align: center; }

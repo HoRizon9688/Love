@@ -17,6 +17,7 @@ const stage = ref<CoupleStage>('signed-out')
 const loading = ref(false)
 const initialized = ref(false)
 const demoMode = ref(false)
+const awaitingCoupleEntry = ref(false)
 
 export function useCoupleAuth() {
   const { $supabase } = useNuxtApp()
@@ -37,7 +38,7 @@ export function useCoupleAuth() {
       displayName: user.value?.user_metadata?.display_name || email.split('@')[0],
       coupleId: memberData?.couple_id,
     }
-    stage.value = memberData?.couple_id ? 'paired' : 'unpaired'
+    stage.value = memberData?.couple_id && !awaitingCoupleEntry.value ? 'paired' : 'unpaired'
   }
 
   async function initialize() {
@@ -50,7 +51,7 @@ export function useCoupleAuth() {
     $supabase.auth.onAuthStateChange((_event, session) => {
       user.value = session?.user || null
       if (user.value) void loadMembership(user.value.id, user.value.email || '')
-      else { profile.value = null; stage.value = 'signed-out' }
+      else { awaitingCoupleEntry.value = false; profile.value = null; stage.value = 'signed-out' }
     })
   }
 
@@ -141,10 +142,10 @@ export function useCoupleAuth() {
 
   async function createCouple(displayName: string, relationshipStart: string) {
     loading.value = true
+    awaitingCoupleEntry.value = true
     try {
       if (!$supabase || demoMode.value) {
         profile.value = { ...profile.value!, coupleId: 'demo-couple', partnerName: '等待加入' }
-        stage.value = 'paired'
         return 'LOVE-7286'
       }
       const { data, error } = await $supabase.rpc('create_couple_with_invitation', {
@@ -152,8 +153,24 @@ export function useCoupleAuth() {
         relationship_start: relationshipStart,
       })
       if (error) throw error
-      await loadMembership(user.value!.id, user.value!.email || '')
       return data as string
+    } catch (error) {
+      awaitingCoupleEntry.value = false
+      throw error
+    } finally { loading.value = false }
+  }
+
+  async function enterCreatedCouple() {
+    loading.value = true
+    try {
+      if ($supabase && !demoMode.value) {
+        const currentUser = user.value
+        if (!currentUser) throw new Error('请先登录')
+        await loadMembership(currentUser.id, currentUser.email || '')
+      }
+      if (!profile.value?.coupleId) throw new Error('空间尚未加载，请重试')
+      awaitingCoupleEntry.value = false
+      stage.value = 'paired'
     } finally { loading.value = false }
   }
 
@@ -176,9 +193,10 @@ export function useCoupleAuth() {
     if ($supabase) await $supabase.auth.signOut()
     user.value = null
     profile.value = null
+    awaitingCoupleEntry.value = false
     stage.value = 'signed-out'
     demoMode.value = false
   }
 
-  return { configured, demoMode, initialized, loading, profile, stage, initialize, signIn, signUp, signInWithAccount, signUpWithAccount, signInWithOAuth, recoverAccount, resendConfirmation, updatePassword, createCouple, joinCouple, signOut }
+  return { configured, demoMode, initialized, loading, profile, stage, initialize, signIn, signUp, signInWithAccount, signUpWithAccount, signInWithOAuth, recoverAccount, resendConfirmation, updatePassword, createCouple, enterCreatedCouple, joinCouple, signOut }
 }

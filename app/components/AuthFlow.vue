@@ -10,7 +10,7 @@ let animationContext: ReturnType<typeof context>
 let panelTimeline: ReturnType<typeof gsap.timeline> | undefined
 
 const emit = defineEmits<{ complete: [] }>()
-const { configured, demoMode, loading, profile, stage, signIn, signUp, signInWithAccount, signUpWithAccount, signInWithOAuth, recoverAccount, resendConfirmation, createCouple, joinCouple } = useCoupleAuth()
+const { configured, demoMode, loading, profile, stage, signIn, signUp, signInWithAccount, signUpWithAccount, signInWithOAuth, recoverAccount, resendConfirmation, createCouple, enterCreatedCouple, joinCouple } = useCoupleAuth()
 const mode = ref<'login' | 'register'>('login')
 const loginType = ref<'email' | 'account'>('email')
 const recovering = ref(false)
@@ -110,6 +110,12 @@ async function submitCreate() {
   catch (error: any) { errorMessage.value = error.message || '创建失败' }
 }
 
+async function enterCreatedSpace() {
+  errorMessage.value = ''
+  try { await enterCreatedCouple(); emit('complete') }
+  catch (error: any) { errorMessage.value = error.message || '打开空间失败' }
+}
+
 async function submitJoin() {
   errorMessage.value = ''
   try { await joinCouple(inviteCode.value); emit('complete') }
@@ -190,7 +196,7 @@ async function resendEmail() {
       </div>
 
       <div v-else-if="stage === 'unpaired'" class="auth-card pairing-card">
-        <button v-if="pairingMode !== 'choose'" class="back-button" type="button" aria-label="返回" @click="pairingMode = 'choose'; generatedCode = ''; errorMessage = ''"><ArrowLeft :size="19" /></button>
+        <button v-if="pairingMode !== 'choose' && !generatedCode" class="back-button" type="button" :disabled="loading" aria-label="返回" @click="pairingMode = 'choose'; errorMessage = ''"><ArrowLeft :size="19" /></button>
         <div class="auth-heading">
           <p>你好，{{ profile?.displayName }}</p>
           <h2>{{ pairingMode === 'choose' ? '和谁一起收藏故事？' : pairingMode === 'create' ? '创建我们的空间' : '加入对方的空间' }}</h2>
@@ -210,7 +216,8 @@ async function resendEmail() {
           <span class="success-icon"><Check :size="24" /></span><h3>空间创建好了</h3><p>把下面的邀请码发给另一半，有效期为 7 天。</p>
           <button class="code-box" type="button" @click="copyCode"><strong>{{ generatedCode }}</strong><Copy :size="18" /></button>
           <small>{{ copied ? '已复制到剪贴板' : '点击复制邀请码' }}</small>
-          <button class="auth-submit" type="button" @click="emit('complete')">先进入空间</button>
+          <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
+          <button class="auth-submit" type="button" :disabled="loading" @click="enterCreatedSpace">先进入空间</button>
         </div>
         <form v-else class="auth-form" @submit.prevent="submitJoin">
           <label><span>专属邀请码</span><div><Link2 :size="18" /><input v-model="inviteCode" maxlength="32" placeholder="粘贴伴侣发来的邀请码"></div></label>

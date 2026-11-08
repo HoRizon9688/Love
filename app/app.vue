@@ -412,7 +412,8 @@ function animatePageLeave(element: Element, done: () => void) {
   pageMotionContext?.revert()
   pageMotionContext = undefined
   if (!import.meta.client || !shouldAnimate.value || !gsap?.to) {
-    done()
+    // The out-in transition updates its child after leave. Let the current render finish first.
+    queueMicrotask(done)
     return
   }
   gsap.to(element, {

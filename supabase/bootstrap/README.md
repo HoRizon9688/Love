@@ -1,17 +1,34 @@
-# 新数据库身份底座
+# 新空库迁移链
 
-`20261109000000_identity.sql` 是新空库迁移链的第一段，依赖 Supabase 提供的 `auth.users`、`auth.uid()` 和 API 角色。当前放在 `bootstrap/` 单独验证，`supabase/migrations/` 仍是旧版历史链。新链齐备后再统一切换 CLI 迁移目录。新旧链不能叠加执行。
+`bootstrap/` 按版本号顺序从空的 Supabase 项目初始化。它依赖 Supabase 的 Auth 角色、`auth.users`、`auth.uid()` 和 Realtime。根 `supabase/migrations/` 仍对应旧应用。新链在独立的本地工作目录运行，待应用切换后再接管根迁移目录。新旧两条链分别对应不同数据库。
+
+| 版本末尾 | 内容 |
+| --- | --- |
+| `0000` | 资料、空间、成员、邀请码和 RLS |
+| `0100` | 每账号私有的成员刷新频道 |
+| `0200` | 消息、时光、相册、清单、纪念日、手写情书与声音胶囊 |
+| `0300` | 心情、问答、共享日历、照片互动、彩蛋与分享链接 |
+| `0400` | 未来邮箱及服务器时间解封 |
+| `0500` | 独立双人签到、历史、连续天数和保护卡 |
+| `0600` | 脱敏活动流与保留表 Realtime 发布 |
+| `0700` | 账号映射、恢复码、限流与 Auth 删除事务中的清理 |
 
 这段迁移创建资料、空间、成员和邀请表，保留现有的创建、绑定、重发、解除和成员资料 RPC 签名。每个空间只有 1、2 两个成员槽位，同一个账号只能属于一个空间。邀请码使用 32 位随机 UUID 十六进制文本，只存摘要，有效期 7 天，重发吊销上一条。接受时先锁空间，再检查并锁邀请码，加入和消费在同一个事务。
 
-任一成员解绑或随账号删除而离开后，该空间停止接受新成员，仍在空间的一方继续通过 RLS 访问原空间。两人重新绑定需使用新空间。伴侣资料只经 RPC 返回昵称和头像，登录安全字段维持本人可读。原始成员表不加入实时 publication，避免 DELETE 事件暴露旧主键。后续用受授权的最小事件通知客户端重新查询，并在 Supabase 服务中验证 WebSocket 的隔离与解绑。应用全局账号准入、注册、恢复码、业务表 RLS 和 R2 属于后续迁移或服务改造。 [Supabase Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes#receiving-old-records)
+任一成员解绑或随账号删除而离开后，该空间停止接受新成员，仍在空间的一方继续通过 RLS 访问原空间。两人重新绑定需使用新空间。伴侣资料只经 RPC 返回昵称和头像，登录安全字段维持本人可读。成员刷新事件按用户 ID 投递空载荷，第三方无法订阅。业务 publication 只发送 INSERT 和 UPDATE，删除通知由受 RLS 约束的活动流承担。活动流只保存通用文案，省略聊天正文和问答正文。 [Supabase Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes#receiving-old-records)
+
+双人打卡以 `Asia/Shanghai` 服务器日期为准。客户端提交已显示的日期和请求 UUID。若请求等锁跨过午夜，服务器拒绝旧日期并要求刷新。每人每天只有一条动作，两名有效成员当天完成后结算一次。漏一天可消耗一张保护卡，连续数每到 7 的倍数获得一张，最多持有 3 张。漏两天或没有可用保护卡时，下次双人完成从 1 开始，历史最高值保留。
 
 ## 本地验证
 
-Windows x64 使用 Node 24 与独立的 PostgreSQL 17 工具目录。本次验证脚本、工具、临时数据库和动态测试身份均在 Git 提交范围之外。当前工作区可复跑本地留存的脚本，它只连接脚本自己启动的回环地址。
+独立 Supabase 实例 `love-phase2-local` 使用 API 端口 55421、数据库端口 55422，CLI 从 `.local/supabase-phase2` 读取配置和迁移。本地配置关闭公开注册，保留已创建测试账号的邮箱密码登录。测试脚本、CLI、测试数据、账号和凭据均由 Git 忽略。下面的命令针对当前工作区已准备的本地实例。
 
 ```powershell
-node .local/phase2/verify-local-identity.mjs
+node .local/supabase-phase2/verify-real-supabase.mjs --retained --streak --activity --security --data-realtime
 ```
 
-脚本在两套全新 PostgreSQL 数据库运行同一组断言。每组生成匿名上下文、两个或更多隔离的账号会话，通过独立连接并发执行 RPC，验证数据库实际 RLS、DDL 和事务。账号数据为临时数据库生成的合成记录，测试结束后清理。Auth 的数据库上下文由测试设置，真实 Supabase 登录、PostgREST 和 WebSocket 需要独立 Supabase 测试栈。
+测试通过真实 Auth 登录三个临时账号，以各自 JWT 调用 PostgREST 和 Realtime。保护卡边界用专用本地库中当前测试空间的历史状态构造。脚本检查本地回环地址和预期端口，完成后清理临时身份。旧的纯 PostgreSQL 身份测试也仍可从 `.local/phase2/verify-local-identity.mjs` 单独运行。
+
+## 应用切换条件
+
+旧界面需改用私有成员刷新、脱敏删除事件和打卡 RPC，并完成 A–E 模块拆除及 R2 接入后，才能用新迁移链替换当前应用后端。当前 `account-auth` 的注册分支直接调用 Auth 管理接口，应用公开发布前要把该分支纳入受控的两账号准入。上述本地栈使用管理员预置账号，未启用该 Edge 注册入口。新增数据库迁移从新空库起步，已有数据需走独立备份与映射演练。

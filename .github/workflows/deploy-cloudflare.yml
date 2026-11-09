@@ -14,15 +14,8 @@ jobs:
     env:
       NUXT_PUBLIC_SUPABASE_URL: ${{ secrets.NUXT_PUBLIC_SUPABASE_URL }}
       NUXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NUXT_PUBLIC_SUPABASE_ANON_KEY }}
-      NUXT_PUBLIC_TURN_URLS: ${{ secrets.NUXT_PUBLIC_TURN_URLS }}
-      NUXT_PUBLIC_TURN_USERNAME: ${{ secrets.NUXT_PUBLIC_TURN_USERNAME }}
-      NUXT_PUBLIC_TURN_CREDENTIAL: ${{ secrets.NUXT_PUBLIC_TURN_CREDENTIAL }}
-      NUXT_PUBLIC_ZEGO_APP_ID: ${{ secrets.NUXT_PUBLIC_ZEGO_APP_ID }}
-      NUXT_PUBLIC_ZEGO_APPSIGN: ${{ secrets.NUXT_PUBLIC_ZEGO_APPSIGN }}
-      NUXT_PUBLIC_ZEGO_SERVER: ${{ secrets.NUXT_PUBLIC_ZEGO_SERVER }}
-      NUXT_PUBLIC_AMAP_KEY: ${{ secrets.NUXT_PUBLIC_AMAP_KEY }}
-      NUXT_PUBLIC_AMAP_SECURITY_CODE: ${{ secrets.NUXT_PUBLIC_AMAP_SECURITY_CODE }}
       NUXT_PUBLIC_APP_BUILD: ${{ github.sha }}
+      NUXT_PUBLIC_UPDATE_MANIFEST_URL: ${{ vars.NUXT_PUBLIC_UPDATE_MANIFEST_URL }}
 
     steps:
       - name: Checkout
@@ -40,29 +33,43 @@ jobs:
       - name: TypeScript check
         run: npx tsc --noEmit
 
+      - name: Stage Android APK from this repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_APK_RELEASE_TAG: ${{ vars.APP_APK_RELEASE_TAG }}
+        run: |
+          if [[ -z "$APP_APK_RELEASE_TAG" ]]; then
+            echo 'No Android release configured. Deploying the web app only.'
+            exit 0
+          fi
+
+          apk_dir="$(mktemp -d)"
+          if gh release download --repo "$GITHUB_REPOSITORY" --pattern "Love小家-latest.apk" --dir "$apk_dir" -- "$APP_APK_RELEASE_TAG"; then
+            mkdir -p public/downloads
+            cp "$apk_dir/Love小家-latest.apk" public/downloads/
+          else
+            echo '::warning::The configured release APK could not be downloaded. Deploying the web app only.'
+          fi
+
       - name: Write update manifest
         env:
           APP_UPDATE_NOTES: ${{ vars.APP_UPDATE_NOTES }}
           APP_UPDATE_PUBLISHED_AT: ${{ github.event.head_commit.timestamp || '' }}
+          APP_UPDATE_BASE_URL: ${{ vars.APP_UPDATE_BASE_URL }}
         run: npm run update:manifest
 
       - name: Generate static site
         run: npm run generate
 
-      - name: Download latest APK from GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p .output/public/downloads
-          gh release download --repo XTH-LOVE/Love- --pattern "*.apk" --dir .output/public/downloads --clobber
-          # Rename to the canonical filename expected by app-update.json
-          cd .output/public/downloads && for f in *.apk; do mv "$f" "Love小家-latest.apk"; done && cd -
-
       - name: Prepare official landing deployment
         run: |
-          mkdir -p .output/landing-public/downloads
+          mkdir -p .output/landing-public
           cp public/official/index.html .output/landing-public/index.html
-          cp .output/public/downloads/Love小家-latest.apk .output/landing-public/downloads/Love小家-latest.apk
+          cp .output/public/app-update.json .output/landing-public/
+          if [[ -f .output/public/downloads/Love小家-latest.apk ]]; then
+            mkdir -p .output/landing-public/downloads
+            cp .output/public/downloads/Love小家-latest.apk .output/landing-public/downloads/
+          fi
           printf '/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n' > .output/landing-public/_headers
 
       - name: Deploy to Cloudflare Pages

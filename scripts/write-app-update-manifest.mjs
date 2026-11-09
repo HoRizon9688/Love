@@ -13,14 +13,21 @@ const notes = String(process.env.APP_UPDATE_NOTES || '')
   .map(value => value.trim())
   .filter(Boolean)
 
+const apkFilename = 'Love小家-latest.apk'
+const baseUrl = process.env.APP_UPDATE_BASE_URL ? new URL('/', process.env.APP_UPDATE_BASE_URL) : null
+if (baseUrl && (baseUrl.protocol !== 'https:' || baseUrl.username || baseUrl.password)) {
+  throw new Error('APP_UPDATE_BASE_URL must be an HTTPS URL without credentials')
+}
+const hasApk = fs.existsSync(path.join(root, 'public', 'downloads', apkFilename))
+
 const manifest = {
   version: packageJson.version,
   buildId: process.env.NUXT_PUBLIC_APP_BUILD || process.env.GITHUB_SHA || `local-${packageJson.version}`,
   title: previous.title || 'Love小家有新版本了',
   notes: notes.length ? notes : Array.isArray(previous.notes) ? previous.notes : [],
-  apkUrl: previous.apkUrl || 'https://love-home.pages.dev/downloads/Love小家-latest.apk',
+  apkUrl: baseUrl && hasApk ? new URL(`downloads/${encodeURIComponent(apkFilename)}`, baseUrl).href : '',
   desktopUrl: previous.desktopUrl || '',
-  webUrl: previous.webUrl || 'https://love-home.pages.dev/',
+  webUrl: baseUrl?.href || '',
   publishedAt: process.env.APP_UPDATE_PUBLISHED_AT || new Date().toISOString(),
   mandatory: previous.mandatory === true,
 }

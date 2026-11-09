@@ -180,6 +180,7 @@ async function refreshHero(event: Event) {
     </section>
 
     <LoveQuoteCarousel />
+    <CoupleCheckInCard />
     <MoodCheckinWidget />
     <DailyQuestionCard />
 

@@ -1,4 +1,5 @@
 import { reactive, ref } from 'vue'
+import { checkMediaStorage } from './useMediaUrls'
 
 export type SpaceServiceKey = 'supabase' | 'media' | 'notifications'
 export type SpaceServiceState = 'checking' | 'ok' | 'warning' | 'error' | 'offline'
@@ -76,7 +77,7 @@ export function useSpaceStatus() {
     else if (memberCheck.error) services.supabase = { state: 'error', detail: '数据库连接失败，请重试' }
     else services.supabase = { state: 'ok', detail: 'Supabase 数据库连接正常' }
     const coupleId = profile.value?.coupleId
-    const mediaCheck = coupleId ? await withTimeout($supabase.storage.from('album-media').list(coupleId, { limit: 1 })) : null
+    const mediaCheck = coupleId ? await withTimeout(checkMediaStorage($supabase, coupleId)) : null
     if (!coupleId) services.media = { state: 'warning', detail: '绑定情侣空间后检查媒体服务' }
     else if (!mediaCheck) services.media = { state: 'error', detail: '图片服务请求超时' }
     else if (mediaCheck.error) services.media = { state: 'error', detail: '私有图片服务不可用' }

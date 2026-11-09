@@ -1,6 +1,6 @@
 export type Album = { id: string; name: string; description: string; coverUrl: string; createdAt: string; photoCount: number }
 export type GalleryPhoto = { id: string; path: string; thumbPath?: string; mediumPath?: string; originalPath?: string; videoPosterPath?: string; videoPosterUrl?: string; url: string; originalUrl?: string; loadState?: 'pending'|'ready'|'error'; takenDate: string; albumId: string; albumName: string; source: 'album' | 'memory'; caption: string; mediaType:'image'|'video'; uploadedBy:string; uploaderName:string; legacy:boolean }
-import { createMediaSignedUrl, createMediaSignedUrls, createVideoPoster, prepareImageVariants, prepareVideoForUpload, uploadMediaResumable } from './useMediaUrls'
+import { createMediaSignedUrl, createMediaSignedUrls, createVideoPoster, isR2MediaUploadEnabled, mediaUploadPath, prepareImageVariants, prepareVideoForUpload, removeMediaObjects, uploadMediaResumable } from './useMediaUrls'
 import { runQueuedUpload } from './useMediaUploadQueue'
 
 const albums = ref<Album[]>([])
@@ -76,7 +76,7 @@ export function useAlbums() {
     }
   }
   async function optimizeLegacyPhoto(photo: GalleryPhoto) {
-    if (!$supabase || demoMode.value || !photo.url || photo.thumbPath || photo.mediaType !== 'image') return
+    if (!$supabase || demoMode.value || isR2MediaUploadEnabled() || photo.path.startsWith('r2/') || !photo.url || photo.thumbPath || photo.mediaType !== 'image') return
     const bucket = photo.legacy ? 'memory-photos' : 'album-media'
     const base = photo.path.replace(/\.[^.]+$/, '')
     const paths = { thumb: `${base}/thumb.jpg`, medium: `${base}/medium.jpg` }
@@ -96,7 +96,7 @@ export function useAlbums() {
       photo.thumbPath = paths.thumb; photo.mediumPath = paths.medium; photo.originalPath = photo.path
       photo.url = await createMediaSignedUrl($supabase, paths.thumb, bucket)
     } catch {
-      await $supabase.storage.from(bucket).remove([paths.thumb, paths.medium]).catch(() => undefined)
+      await removeMediaObjects($supabase, bucket, [paths.thumb, paths.medium]).catch(() => undefined)
     }
   }
   async function retryPhoto(photo: GalleryPhoto) {
@@ -193,48 +193,90 @@ export function useAlbums() {
   }
 
   async function uploadToAlbum(albumId: string, files: File[], takenDate: string) {
-    const album = albums.value.find(item => item.id === albumId)!
-    const uploadedPaths: string[] = []
+    const album = albums.value.find(item => item.id === albumId)
+    if (!album) throw new Error('找不到相册')
+    const readLocally = !$supabase || demoMode.value
+    const actor = profile.value
+    const coupleId = actor?.coupleId
+    const actorId = actor?.id
     try {
       for (const sourceFile of files) {
-      if (!$supabase || demoMode.value) {
-        const file = sourceFile
-        const url = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result as string); reader.onerror = reject; reader.readAsDataURL(file) })
-        albumPhotos.value.unshift({ id: crypto.randomUUID(), path: '', url, takenDate, albumId, albumName: album.name, source: 'album', caption: '',mediaType:file.type.startsWith('video/')?'video':'image',uploadedBy:profile.value?.id||'demo-user',uploaderName:profile.value?.displayName||'我',legacy:false }); continue
-      }
-      const result = await runQueuedUpload(sourceFile, `相册 · ${sourceFile.name}`, async setProgress => {
-        if (sourceFile.type.startsWith('video/')) {
-          const file = await prepareVideoForUpload(sourceFile); const poster = await createVideoPoster(file); setProgress(35)
-          const mediaId = crypto.randomUUID(); const ext = file.name.split('.').pop()?.toLowerCase() || 'webm'; const path = `${profile.value!.coupleId}/album-media/${albumId}/${mediaId}.${ext}`; const posterPath = poster ? `${profile.value!.coupleId}/album-media/${albumId}/${mediaId}/poster.jpg` : ''
-          const { error: uploadError } = await uploadMediaResumable($supabase, 'album-media', path, file, value => setProgress(35 + Math.round(value * .3))); uploadedPaths.push(path); if (uploadError) throw uploadError
-          if (poster && posterPath) { const { error: posterError } = await uploadMediaResumable($supabase, 'album-media', posterPath, poster, value => setProgress(65 + Math.round(value * .08))); uploadedPaths.push(posterPath); if (posterError) throw posterError }
-          setProgress(78)
-          const { error } = await $supabase.from('album_photos').insert({ album_id: albumId, uploaded_by: profile.value!.id, path, original_path: path, video_poster_path: posterPath || null, taken_date: takenDate,media_type:'video' }); if (error) throw error
-          if (!album.coverUrl) await $supabase.from('albums').update({ cover_path: posterPath || path }).eq('id', albumId)
-          return path
+        if (readLocally) {
+          const url = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result as string); reader.onerror = reject; reader.readAsDataURL(sourceFile) })
+          albumPhotos.value.unshift({ id: crypto.randomUUID(), path: '', url, takenDate, albumId, albumName: album.name, source: 'album', caption: '', mediaType: sourceFile.type.startsWith('video/') ? 'video' : 'image', uploadedBy: actorId || 'demo-user', uploaderName: actor?.displayName || '我', legacy: false })
+          continue
         }
-        const variants = await prepareImageVariants(sourceFile); setProgress(25)
-        const base = `${profile.value!.coupleId}/album-media/${albumId}/${crypto.randomUUID()}`
-        const paths = { thumb: `${base}/thumb.jpg`, medium: `${base}/medium.jpg`, original: `${base}/original.jpg` }
-        uploadedPaths.push(...Object.values(paths))
-        const uploadResults = await Promise.all([
-          uploadMediaResumable($supabase, 'album-media', paths.thumb, variants.thumb, value => setProgress(25 + Math.round(value * .16))),
-          uploadMediaResumable($supabase, 'album-media', paths.medium, variants.medium, value => setProgress(41 + Math.round(value * .16))),
-          uploadMediaResumable($supabase, 'album-media', paths.original, variants.original, value => setProgress(57 + Math.round(value * .2))),
-        ])
-        const failed = uploadResults.find(item => item.error); if (failed?.error) throw failed.error
-        setProgress(78)
-        const { error } = await $supabase.from('album_photos').insert({ album_id: albumId, uploaded_by: profile.value!.id, path: paths.original, thumb_path: paths.thumb, medium_path: paths.medium, original_path: paths.original, taken_date: takenDate, media_type:'image' }); if (error) throw error
-        if (!album.coverUrl) await $supabase.from('albums').update({ cover_path: paths.thumb }).eq('id', albumId)
-        return paths.original
-      }, { kind: 'album', coupleId: profile.value!.coupleId, albumId, takenDate, mediaType: sourceFile.type })
-      uploadedPaths.push(result)
+        if (!$supabase || !coupleId || !actorId) throw new Error('请先进入情侣空间')
+        const ensureScope = () => {
+          if (profile.value?.id !== actorId || profile.value?.coupleId !== coupleId) throw new Error('空间已切换，请重新选择文件')
+        }
+        const base = mediaUploadPath(`${coupleId}/album-media/${albumId}/${crypto.randomUUID()}`)
+        const isVideo = sourceFile.type.startsWith('video/')
+        const r2 = base.startsWith('r2/')
+        type Upload = { path: string; file: File }
+        type PhotoRow = { path: string; original_path: string; thumb_path?: string; medium_path?: string; video_poster_path?: string | null; media_type: 'image' | 'video' }
+        async function prepare(): Promise<{ uploads: Upload[]; row: PhotoRow; coverPath: string }> {
+          if (isVideo) {
+            const file = r2 ? sourceFile : await prepareVideoForUpload(sourceFile)
+            const mime = file.type.split(';', 1)[0]
+            const knownExtension = mime === 'video/mp4' ? 'mp4' : mime === 'video/quicktime' ? 'mov' : mime === 'video/webm' ? 'webm' : ''
+            if (r2 && !knownExtension) throw new Error('请上传 MP4、WebM 或 MOV 视频')
+            const extension = knownExtension || file.name.match(/\.([a-z0-9]{1,8})$/i)?.[1]?.toLowerCase() || 'webm'
+            const path = `${base}.${extension}`
+            const poster = await createVideoPoster(file)
+            const posterPath = poster ? `${base}/poster.jpg` : null
+            const uploads = [{ path, file }]
+            if (poster && posterPath) uploads.push({ path: posterPath, file: poster })
+            return { uploads, row: { path, original_path: path, video_poster_path: posterPath, media_type: 'video' }, coverPath: posterPath || path }
+          }
+          const variants = await prepareImageVariants(sourceFile)
+          const path = `${base}/original.jpg`
+          const thumb = `${base}/thumb.jpg`
+          const medium = `${base}/medium.jpg`
+          return {
+            uploads: [{ path: thumb, file: variants.thumb }, { path: medium, file: variants.medium }, { path, file: variants.original }],
+            row: { path, original_path: path, thumb_path: thumb, medium_path: medium, media_type: 'image' },
+            coverPath: thumb,
+          }
+        }
+        let preparation: ReturnType<typeof prepare> | undefined
+        const completedPaths = new Set<string>()
+        await runQueuedUpload(sourceFile, `相册 · ${sourceFile.name}`, async setProgress => {
+          ensureScope()
+          const { uploads, row, coverPath } = await (preparation ??= prepare())
+          ensureScope()
+          const progress = uploads.map(() => 0)
+          const outcomes = await Promise.allSettled(uploads.map(async ({ path, file }, index) => {
+            if (completedPaths.has(path)) { progress[index] = 100; return }
+            const { error } = await uploadMediaResumable($supabase, 'album-media', path, file, percent => {
+              progress[index] = percent
+              setProgress(25 + Math.round(progress.reduce((sum, value) => sum + value, 0) * .5 / uploads.length))
+            })
+            if (error) throw error
+            completedPaths.add(path)
+          }))
+          const failure = outcomes.find(outcome => outcome.status === 'rejected')
+          if (failure?.status === 'rejected') throw failure.reason
+          ensureScope()
+          setProgress(78)
+          const { error } = await $supabase.from('album_photos').insert({ ...row, album_id: albumId, uploaded_by: actorId, taken_date: takenDate })
+          if (error) {
+            // A lost response can leave the original insert committed before a retry.
+            if (error.code !== '23505') throw error
+            const { data } = await $supabase.from('album_photos').select('id').eq('path', row.path).eq('album_id', albumId).eq('uploaded_by', actorId).maybeSingle()
+            if (!data) throw error
+          }
+          if (!album.coverUrl) await $supabase.from('albums').update({ cover_path: coverPath }).eq('id', albumId)
+          await loadAlbums(true).catch(() => undefined)
+        }, { kind: 'album', coupleId, albumId, takenDate, mediaType: sourceFile.type })
       }
-    } catch (error) {
-      if ($supabase && uploadedPaths.length) await $supabase.storage.from('album-media').remove([...new Set(uploadedPaths)]).catch(() => undefined)
-      throw error
+    } finally {
+      if (readLocally) {
+        album.photoCount = albumPhotos.value.filter(photo => photo.albumId === albumId).length
+        album.coverUrl ||= albumPhotos.value.find(photo => photo.albumId === albumId)?.url || ''
+        demoSave()
+      }
     }
-    if (!$supabase || demoMode.value) { album.photoCount = albumPhotos.value.filter(photo => photo.albumId === albumId).length; album.coverUrl ||= albumPhotos.value.find(photo => photo.albumId === albumId)?.url || ''; demoSave() } else await loadAlbums(true)
   }
 
   async function deletePhoto(photo: GalleryPhoto) {
@@ -242,7 +284,7 @@ export function useAlbums() {
     if (!$supabase || demoMode.value) { albumPhotos.value = albumPhotos.value.filter(item => item.id !== photo.id); demoSave(); return }
     const paths = [...new Set([photo.path, photo.thumbPath, photo.mediumPath, photo.originalPath, photo.videoPosterPath].filter(Boolean))]
     if (paths.length) {
-      const { error: storageError } = await $supabase.storage.from(photo.legacy ? 'memory-photos' : 'album-media').remove(paths)
+      const { error: storageError } = await removeMediaObjects($supabase, photo.legacy ? 'memory-photos' : 'album-media', paths)
       if (storageError) throw storageError
     }
     const { error } = await $supabase.from('album_photos').delete().eq('id', photo.id); if (error) throw error

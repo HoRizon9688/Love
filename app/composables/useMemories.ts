@@ -15,7 +15,7 @@ export type Memory = {
   reactions: Record<string, MemoryReaction>
   comments: MemoryComment[]
 }
-import { createMediaSignedUrl, createMediaSignedUrls, prepareImageVariants, uploadMediaResumable } from './useMediaUrls'
+import { createMediaSignedUrl, createMediaSignedUrls, isR2MediaUploadEnabled, mediaUploadPath, prepareImageVariants, removeMediaObjects, uploadMediaResumable } from './useMediaUrls'
 import { runQueuedUpload } from './useMediaUploadQueue'
 
 const demoSeed: Memory[] = [
@@ -124,7 +124,7 @@ export function useMemories() {
     } catch { /* The migration may not be deployed yet; media remains usable. */ }
   }
   async function optimizeLegacyPhoto(memory: Memory, photo: MemoryPhoto) {
-    if (!$supabase || demoMode.value || !photo.url || photo.thumbPath) return
+    if (!$supabase || demoMode.value || isR2MediaUploadEnabled() || photo.path.startsWith('r2/') || !photo.url || photo.thumbPath) return
     const bucket = bucketForPath(photo.path)
     const base = photo.path.replace(/\.[^.]+$/, '')
     const paths = { thumb: `${base}/thumb.jpg`, medium: `${base}/medium.jpg` }
@@ -145,7 +145,7 @@ export function useMemories() {
       photo.thumbPath = paths.thumb; photo.mediumPath = paths.medium; photo.originalPath = photo.path
       photo.url = await createMediaSignedUrl($supabase, paths.thumb, bucket)
     } catch {
-      await $supabase.storage.from(bucket).remove([paths.thumb, paths.medium]).catch(() => undefined)
+      await removeMediaObjects($supabase, bucket, [paths.thumb, paths.medium]).catch(() => undefined)
     }
   }
 
@@ -193,33 +193,44 @@ export function useMemories() {
       const reader = new FileReader(); reader.onload = () => resolve({ path: '', url: reader.result as string }); reader.onerror = reject; reader.readAsDataURL(file)
     })))
     const results: MemoryPhoto[] = []
-    const uploadedPaths: string[] = []
-    try {
-      for (const sourceFile of files) {
-        const result = await runQueuedUpload(sourceFile, `时光 · ${sourceFile.name}`, async setProgress => {
-          const variants = await prepareImageVariants(sourceFile); setProgress(25)
-          const base = `${profile.value!.coupleId}/${crypto.randomUUID()}`
-          const paths = { thumb: `${base}/thumb.jpg`, medium: `${base}/medium.jpg`, original: `${base}/original.jpg` }
-          uploadedPaths.push(...Object.values(paths))
-          const uploadResults = await Promise.all([
-            uploadMediaResumable($supabase, 'memory-photos', paths.thumb, variants.thumb, value => setProgress(25 + Math.round(value * .16))),
-            uploadMediaResumable($supabase, 'memory-photos', paths.medium, variants.medium, value => setProgress(41 + Math.round(value * .16))),
-            uploadMediaResumable($supabase, 'memory-photos', paths.original, variants.original, value => setProgress(57 + Math.round(value * .2)), false),
-          ])
-          const failed = uploadResults.find(item => item.error); if (failed?.error) throw failed.error
-          setProgress(82)
-          return { path: paths.original, thumbPath: paths.thumb, mediumPath: paths.medium, originalPath: paths.original, url: await createMediaSignedUrl($supabase, paths.thumb, 'memory-photos') }
-        }, { kind: 'memory', coupleId: profile.value!.coupleId, mediaType: sourceFile.type })
-        results.push(result)
-      }
-    } catch (error) {
-      if (uploadedPaths.length) await $supabase.storage.from('memory-photos').remove([...new Set(uploadedPaths)]).catch(() => undefined)
-      throw error
+    const actor = profile.value
+    const coupleId = actor?.coupleId
+    if (!coupleId) throw new Error('请先进入情侣空间')
+    const ensureScope = () => {
+      if (profile.value?.id !== actor.id || profile.value?.coupleId !== coupleId) throw new Error('空间已切换，请重新选择文件')
+    }
+    for (const sourceFile of files) {
+      const base = mediaUploadPath(`${coupleId}/${crypto.randomUUID()}`)
+      const paths = { thumb: `${base}/thumb.jpg`, medium: `${base}/medium.jpg`, original: `${base}/original.jpg` }
+      let preparation: ReturnType<typeof prepareImageVariants> | undefined
+      const completed = new Set<keyof typeof paths>()
+      const result = await runQueuedUpload(sourceFile, `时光 · ${sourceFile.name}`, async setProgress => {
+        ensureScope()
+        const variants = await (preparation ??= prepareImageVariants(sourceFile))
+        ensureScope()
+        const kinds = ['thumb', 'medium', 'original'] as const
+        const progress = { thumb: 0, medium: 0, original: 0 }
+        const outcomes = await Promise.allSettled(kinds.map(async kind => {
+          if (completed.has(kind)) { progress[kind] = 100; return }
+          const { error } = await uploadMediaResumable($supabase, 'memory-photos', paths[kind], variants[kind], percent => {
+            progress[kind] = percent
+            setProgress(25 + Math.round((progress.thumb + progress.medium + progress.original) * .17))
+          })
+          if (error) throw error
+          completed.add(kind)
+        }))
+        const failure = outcomes.find(outcome => outcome.status === 'rejected')
+        if (failure?.status === 'rejected') throw failure.reason
+        setProgress(82)
+        return { path: paths.original, thumbPath: paths.thumb, mediumPath: paths.medium, originalPath: paths.original, url: await createMediaSignedUrl($supabase, paths.thumb, 'memory-photos') }
+      }, { kind: 'memory', coupleId, mediaType: sourceFile.type })
+      results.push(result)
     }
     return results
   }
 
   async function createMemory(input: Omit<Memory, 'id' | 'authorId' | 'authorName' | 'createdAt'>, files: File[]) {
+    const actor = profile.value
     const uploadedPhotos = await uploadPhotos(files)
     const photos = [...input.photos, ...uploadedPhotos]
     if (!$supabase || demoMode.value) {
@@ -227,10 +238,11 @@ export function useMemories() {
       memories.value.unshift({ ...input, photos, id, authorId: profile.value?.id || 'demo-user',authorName:profile.value?.displayName||'我', createdAt: new Date().toISOString() })
       memories.value.sort((a, b) => b.memoryDate.localeCompare(a.memoryDate)); saveDemo(); return id
     }
-    const { error } = await $supabase.from('memories').insert({ couple_id: profile.value!.coupleId, author_id: profile.value!.id, content: input.content, memory_date: input.memoryDate, location: input.location || null, photos: photos.map(({ path, thumbPath, mediumPath, originalPath }) => ({ path, thumbPath, mediumPath, originalPath })) })
+    if (!actor?.coupleId || profile.value?.id !== actor.id || profile.value.coupleId !== actor.coupleId) throw new Error('空间已切换，请重新保存回忆')
+    const { error } = await $supabase.from('memories').insert({ couple_id: actor.coupleId, author_id: actor.id, content: input.content, memory_date: input.memoryDate, location: input.location || null, photos: photos.map(({ path, thumbPath, mediumPath, originalPath }) => ({ path, thumbPath, mediumPath, originalPath })) })
     if (error) {
       const paths = [...new Set(uploadedPhotos.flatMap(photo => [photo.path, photo.thumbPath, photo.mediumPath, photo.originalPath]).filter(Boolean))]
-      if (paths.length) await $supabase.storage.from('memory-photos').remove(paths).catch(() => undefined)
+      if (paths.length && error.code) await removeMediaObjects($supabase, 'memory-photos', paths).catch(() => undefined)
       throw error
     }
     await loadMemories()
@@ -238,6 +250,7 @@ export function useMemories() {
   }
 
   async function updateMemory(id: string, input: Omit<Memory, 'id' | 'authorId' | 'authorName' | 'createdAt'>, files: File[]) {
+    const actor = profile.value
     const uploadedPhotos = await uploadPhotos(files)
     const photos = [...input.photos, ...uploadedPhotos]
     if (!$supabase || demoMode.value) {
@@ -245,19 +258,25 @@ export function useMemories() {
       if (index >= 0) memories.value[index] = { ...memories.value[index]!, ...input, photos }
       memories.value.sort((a, b) => b.memoryDate.localeCompare(a.memoryDate)); saveDemo(); return
     }
-    const { error } = await $supabase.from('memories').update({ content: input.content, memory_date: input.memoryDate, location: input.location || null, photos: photos.map(({ path, thumbPath, mediumPath, originalPath }) => ({ path, thumbPath, mediumPath, originalPath })), updated_at: new Date().toISOString() }).eq('id', id)
-    if (error) {
+    if (!actor?.coupleId || profile.value?.id !== actor.id || profile.value.coupleId !== actor.coupleId) throw new Error('空间已切换，请重新保存回忆')
+    const { data, error } = await $supabase.from('memories').update({ content: input.content, memory_date: input.memoryDate, location: input.location || null, photos: photos.map(({ path, thumbPath, mediumPath, originalPath }) => ({ path, thumbPath, mediumPath, originalPath })), updated_at: new Date().toISOString() }).eq('id', id).select('id').maybeSingle()
+    if (error || !data) {
       const paths = [...new Set(uploadedPhotos.flatMap(photo => [photo.path, photo.thumbPath, photo.mediumPath, photo.originalPath]).filter(Boolean))]
-      if (paths.length) await $supabase.storage.from('memory-photos').remove(paths).catch(() => undefined)
-      throw error
+      if (paths.length && (!error || error.code)) await removeMediaObjects($supabase, 'memory-photos', paths).catch(() => undefined)
+      throw error || new Error('只能编辑自己记录的回忆')
     }
     await loadMemories()
   }
 
   async function deleteMemory(memory: Memory) {
     if (!$supabase || demoMode.value) { memories.value = memories.value.filter(item => item.id !== memory.id); saveDemo(); return }
-    const paths = [...new Set(memory.photos.flatMap(photo => [photo.path, photo.thumbPath, photo.mediumPath, photo.originalPath]).filter(Boolean))]
-    if (paths.length) await $supabase.storage.from('memory-photos').remove(paths)
+    if (memory.authorId !== profile.value?.id) throw new Error('只能删除自己记录的回忆')
+    const paths = [...new Set(memory.photos.flatMap(photo => [photo.path, photo.thumbPath, photo.mediumPath, photo.originalPath])
+      .filter((path): path is string => Boolean(path) && bucketForPath(path!) === 'memory-photos'))]
+    if (paths.length) {
+      const { error } = await removeMediaObjects($supabase, 'memory-photos', paths)
+      if (error) throw error
+    }
     const { error } = await $supabase.from('memories').delete().eq('id', memory.id)
     if (error) throw error
     memories.value = memories.value.filter(item => item.id !== memory.id)

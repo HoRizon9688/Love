@@ -1,5 +1,8 @@
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { createR2MediaStorageProvider, isR2MediaPath } from '../utils/r2MediaStorage'
+
 export type MediaTransform = { width?: number; height?: number; quality?: number; resize?: 'cover' | 'contain' | 'fill' }
-type SupabaseLike = { supabaseUrl?: string; storage: { from: (bucket: string) => { upload: (path: string, file: File, options?: { contentType?: string; upsert?: boolean }) => Promise<{ error?: any }>; createSignedUrl: (path: string, expiresIn: number, options?: { transform?: MediaTransform }) => Promise<{ data?: { signedUrl?: string } | null; error?: unknown }>; createSignedUrls?: (paths: string[], expiresIn: number, options?: { transform?: MediaTransform }) => Promise<{ data?: Array<{ path?: string; signedUrl?: string }> | null; error?: unknown }> } }; auth?: { getSession: () => Promise<{ data?: { session?: { access_token?: string } | null } }> } }
+type SupabaseLike = Pick<SupabaseClient, 'auth' | 'storage'>
 let resumableUploadsDisabled = false
 
 type CachedUrl = { url: string; expiresAt: number }
@@ -16,6 +19,74 @@ const MEDIA_CACHE_MAX_ENTRIES = 300
 let persistedCacheLoaded = false
 const mediaObjectUrlCache = new Map<string, string>()
 const pendingMediaCacheRequests = new Map<string, Promise<string>>()
+const privateThumbnails = new Map<string, CachedUrl>()
+
+function publicMediaConfig() {
+  return tryUseNuxtApp()?.$config.public
+}
+
+export function isR2MediaUploadEnabled() {
+  return publicMediaConfig()?.mediaStorageProvider === 'r2'
+}
+
+export function mediaUploadPath(legacyPath: string) {
+  return isR2MediaUploadEnabled() && !isR2MediaPath(legacyPath) ? `r2/${legacyPath}` : legacyPath
+}
+
+function r2Storage(supabase: SupabaseLike, accessToken?: string) {
+  return createR2MediaStorageProvider(String(publicMediaConfig()?.mediaWorkerUrl || ''), async () =>
+    accessToken || (await supabase.auth.getSession()).data.session?.access_token || '',
+  )
+}
+
+async function readR2Media(supabase: SupabaseLike, bucket: string, path: string) {
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return ''
+    const preview = isPreviewPath(path) || path.endsWith('/poster.jpg')
+    const key = `${session.user.id}:${bucket}:${path}`
+    const cached = preview ? privateThumbnails.get(key) : undefined
+    if (cached && cached.expiresAt > Date.now()) return cached.url
+    const result = await r2Storage(supabase, session.access_token).read(bucket, path)
+    // Never persist a private R2 URL or bytes in localStorage or Cache Storage.
+    if (preview) {
+      if (privateThumbnails.size >= 150) {
+        const firstKey = privateThumbnails.keys().next().value
+        if (firstKey) privateThumbnails.delete(firstKey)
+      }
+      privateThumbnails.set(key, { url: result.url, expiresAt: Math.min(result.expiresAt - 1000, Date.now() + 30_000) })
+    }
+    return result.url
+  } catch { return '' }
+}
+
+export async function removeMediaObjects(supabase: SupabaseLike, bucket: string, paths: readonly (string | null | undefined)[]) {
+  const uniquePaths = [...new Set(paths.filter((path): path is string => Boolean(path)))]
+  const legacy = uniquePaths.filter(path => !isR2MediaPath(path))
+  const privatePaths = uniquePaths.filter(isR2MediaPath)
+  const provider = r2Storage(supabase)
+  try {
+    for (const path of privatePaths) {
+      await provider.remove(bucket, path)
+      await clearCachedMedia(path)
+    }
+    if (legacy.length) {
+      const { error } = await supabase.storage.from(bucket).remove(legacy)
+      if (error) throw error
+    }
+    return { error: null }
+  } catch (error) {
+    return { error: error instanceof Error ? error : new Error('无法删除媒体文件') }
+  }
+}
+
+export async function checkMediaStorage(supabase: SupabaseLike, coupleId: string): Promise<{ error: unknown }> {
+  if (!isR2MediaUploadEnabled()) return supabase.storage.from('album-media').list(coupleId, { limit: 1 })
+  try {
+    await r2Storage(supabase).check()
+    return { error: null }
+  } catch (error) { return { error } }
+}
 
 function cacheKey(bucket: string, path: string, transform?: MediaTransform) { return `${bucket}:${path}:${JSON.stringify(transform || {})}` }
 function isPreviewPath(path: string) { return /(?:^|\/)(?:thumb|medium)\.(?:avif|webp|jpe?g|png)$/i.test(path) }
@@ -113,6 +184,7 @@ async function materializeMediaUrl(key: string, signedUrl: string, cacheable: bo
 }
 
 export async function clearCachedMedia(path?: string) {
+  for (const key of privateThumbnails.keys()) if (!path || key.endsWith(`:${path}`)) privateThumbnails.delete(key)
   if (!import.meta.client || !('caches' in window)) return
   try {
     const matches = (key: string) => !path || key.includes(path)
@@ -134,8 +206,9 @@ export function mediaBucketForPath(path: string, legacy = false) {
 
 export async function createMediaSignedUrl(supabase: SupabaseLike | null | undefined, path: string, bucket?: string, transform?: MediaTransform, expiresIn = 86400) {
   if (!supabase || !path) return ''
-  loadPersistedCache()
   const targetBucket = bucket || mediaBucketForPath(path)
+  if (isR2MediaPath(path)) return readR2Media(supabase, targetBucket, path)
+  loadPersistedCache()
   const key = cacheKey(targetBucket, path, transform)
   const cachedMedia = await readCachedMedia(key)
   if (cachedMedia) return cachedMedia
@@ -169,12 +242,23 @@ export async function createMediaSignedUrls(supabase: SupabaseLike | null | unde
   if (!supabase || !items.length) return result
   loadPersistedCache()
   const groups = new Map<string, Array<{ path: string; transform?: MediaTransform }>>()
+  const privateItems: Array<{ path: string; bucket: string }> = []
   for (const item of items.filter(item => item.path)) {
     const bucket = item.bucket || mediaBucketForPath(item.path)
+    if (isR2MediaPath(item.path)) {
+      privateItems.push({ path: item.path, bucket })
+      continue
+    }
     const key = `${bucket}:${JSON.stringify(item.transform || {})}`
     const list = groups.get(key) || []
     list.push({ path: item.path, transform: item.transform })
     groups.set(key, list)
+  }
+  for (let offset = 0; offset < privateItems.length; offset += 6) {
+    await Promise.all(privateItems.slice(offset, offset + 6).map(async ({ bucket, path }) => {
+      const url = await readR2Media(supabase, bucket, path)
+      if (url) result.set(`${bucket}:${path}`, url)
+    }))
   }
   await Promise.all(Array.from(groups.entries()).map(async ([key, group]) => {
     const bucket = key.split(':', 1)[0]!
@@ -190,8 +274,9 @@ export async function createMediaSignedUrls(supabase: SupabaseLike | null | unde
     }))
     uncached.push(...uncachedItems.filter((item): item is { path: string; transform?: MediaTransform } => Boolean(item)))
     if (!uncached.length) return
-    if (api.createSignedUrls) {
-      const response = await withTimeout(api.createSignedUrls(uncached.map(item => item.path), expiresIn, uncached[0]?.transform ? { transform: uncached[0].transform } : undefined).catch(() => null))
+    const canBatch = !uncached[0]?.transform
+    if (canBatch) {
+      const response = await withTimeout(api.createSignedUrls(uncached.map(item => item.path), expiresIn).catch(() => null))
       await Promise.all((response?.data || []).filter(item => item.path && item.signedUrl).map(async item => {
         const transform = uncached.find(candidate => candidate.path === item.path)?.transform
         const itemKey = cacheKey(bucket, item.path!, transform)
@@ -199,7 +284,7 @@ export async function createMediaSignedUrls(supabase: SupabaseLike | null | unde
         result.set(`${bucket}:${item.path}`, await materializeMediaUrl(itemKey, item.signedUrl!, shouldCacheMedia(item.path!, transform)))
       }))
     }
-    if (!api.createSignedUrls || responseHasMissing(result, bucket, uncached)) {
+    if (!canBatch || responseHasMissing(result, bucket, uncached)) {
       await Promise.all(uncached.filter(item => !result.has(`${bucket}:${item.path}`)).map(async item => {
         const url = await createMediaSignedUrl(supabase, item.path, bucket, item.transform, expiresIn)
         if (url) result.set(`${bucket}:${item.path}`, url)
@@ -218,7 +303,7 @@ export async function refreshMediaElement(event: Event, supabase: SupabaseLike |
   const nextUrl = await createMediaSignedUrl(supabase, path, bucket, transform)
   if (!nextUrl) return false
   element.src = nextUrl
-  if (element instanceof HTMLVideoElement) element.load()
+  if (element instanceof HTMLMediaElement) element.load()
   return true
 }
 
@@ -253,8 +338,17 @@ export async function prepareImageForUpload(file: File, maxSide = 1920, quality 
  */
 export async function uploadMediaResumable(supabase: SupabaseLike | null | undefined, bucket: string, path: string, file: File, onProgress?: (value: number) => void, upsert = false) {
   if (!supabase) throw new Error('Supabase 尚未配置')
+  if (isR2MediaPath(path)) {
+    try {
+      await r2Storage(supabase).upload(bucket, path, file, onProgress)
+      return { error: null }
+    } catch (error) {
+      return { error }
+    }
+  }
   const fallback = () => supabase.storage.from(bucket).upload(path, file, { contentType: file.type, upsert })
-  const endpoint = supabase.supabaseUrl ? `${String(supabase.supabaseUrl).replace(/\/$/, '')}/storage/v1/upload/resumable` : ''
+  const supabaseUrl = publicMediaConfig()?.supabaseUrl
+  const endpoint = supabaseUrl ? `${String(supabaseUrl).replace(/\/$/, '')}/storage/v1/upload/resumable` : ''
   let accessToken = ''
   try { accessToken = String((await supabase.auth?.getSession())?.data?.session?.access_token || '') } catch { /* Use fallback below. */ }
   if (!endpoint || !accessToken || !import.meta.client || resumableUploadsDisabled) return fallback()

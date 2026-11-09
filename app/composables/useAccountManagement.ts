@@ -1,4 +1,4 @@
-import { clearCachedMedia, createMediaSignedUrl } from './useMediaUrls'
+import { clearCachedMedia, createMediaSignedUrl, isR2MediaUploadEnabled, mediaUploadPath, prepareImageForUpload, removeMediaObjects, uploadMediaResumable } from './useMediaUrls'
 
 export type MemberProfile = { id: string; displayName: string; avatarUrl: string; email?: string }
 type ProfileRow = { id: string; display_name: string; avatar_url: string | null }
@@ -52,7 +52,28 @@ async function disconnectMembers() {
   members.value = []
 }
 async function updateName(name:string){if(!$supabase||demoMode.value){if(profile.value)profile.value.displayName=name;await loadMembers();return}const{error}=await $supabase.from('profiles').update({display_name:name}).eq('id',profile.value!.id);if(error)throw error;if(profile.value)profile.value.displayName=name;await loadMembers()}
-async function uploadAvatar(file:File){if(!$supabase||demoMode.value)return URL.createObjectURL(file);const ext=file.name.split('.').pop()?.toLowerCase()||'jpg';const path=`${profile.value!.id}/avatar-${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;const{error}=await $supabase.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:false});if(error)throw error;const{error:updateError}=await $supabase.from('profiles').update({avatar_url:path}).eq('id',profile.value!.id);if(updateError)throw updateError;await clearCachedMedia();await loadMembers();return members.value.find(x=>x.id===profile.value!.id)?.avatarUrl||''}
+async function uploadAvatar(file: File) {
+  if (!$supabase || demoMode.value) return URL.createObjectURL(file)
+  const userId = profile.value?.id
+  if (!userId) throw new Error('请先登录再更换头像')
+  const prepared = await prepareImageForUpload(file, 640)
+  const subtype = prepared.type.split(';')[0]?.split('/')[1]?.toLowerCase()
+  const extension = subtype === 'jpeg' ? 'jpg' : subtype
+  if (isR2MediaUploadEnabled() && (!extension || !['jpg', 'png', 'webp', 'gif', 'avif', 'heic', 'heif'].includes(extension))) {
+    throw new Error('此头像图片格式不受支持')
+  }
+  const path = mediaUploadPath(`${userId}/avatar-${crypto.randomUUID()}.${extension || 'jpg'}`)
+  const { error } = await uploadMediaResumable($supabase, 'avatars', path, prepared)
+  if (error) throw error
+  const { error: updateError } = await $supabase.from('profiles').update({ avatar_url: path }).eq('id', userId)
+  if (updateError) {
+    if (updateError.code) await removeMediaObjects($supabase, 'avatars', [path])
+    throw updateError
+  }
+  await clearCachedMedia()
+  await loadMembers()
+  return members.value.find(member => member.id === userId)?.avatarUrl || ''
+}
 async function regenerateInvitation(){if(!$supabase||demoMode.value)return'LOVE-7286';const{data,error}=await $supabase.rpc('regenerate_couple_invitation');if(error)throw error;return data as string}
 async function unlinkCouple(){if(!$supabase||demoMode.value)return;const{error}=await $supabase.rpc('leave_couple_space');if(error)throw error}
 async function updateRelationshipStart(value:string){if(!value)throw new Error('请选择在一起的日期');if(value>new Date().toISOString().slice(0,10))throw new Error('在一起的日期不能晚于今天');if(!$supabase||demoMode.value){localStorage.setItem('couple-space-start',value);return}const{error}=await $supabase.from('couples').update({relationship_start:value}).eq('id',profile.value!.coupleId);if(error)throw error}

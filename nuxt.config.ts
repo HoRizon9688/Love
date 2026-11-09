@@ -7,6 +7,7 @@ export default defineNuxtConfig({
       viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
       title: 'Love小家 · CoupleSpace',
       meta: [
+        { name: 'referrer', content: 'no-referrer' },
         { name: 'theme-color', content: '#f7edf9' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
@@ -52,6 +53,8 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      mediaStorageProvider: process.env.NUXT_PUBLIC_MEDIA_STORAGE_PROVIDER || 'supabase',
+      mediaWorkerUrl: process.env.NUXT_PUBLIC_MEDIA_WORKER_URL || '',
       appVersion: process.env.NUXT_PUBLIC_APP_VERSION || packageJson.version,
       appBuild: process.env.NUXT_PUBLIC_APP_BUILD || 'local',
       updateManifestUrl: process.env.NUXT_PUBLIC_UPDATE_MANIFEST_URL || '/app-update.json',

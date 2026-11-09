@@ -1,6 +1,6 @@
 import Uppy from '@uppy/core'
 import GoldenRetriever from '@uppy/golden-retriever'
-import { restorePersistedJobs, restoredJobPatch, uploadQueueStorageKey } from '~/utils/uploadQueuePersistence'
+import { restorePersistedJobs, restoredJobPatch, uploadQueueStorageKey } from '../utils/uploadQueuePersistence'
 
 export type UploadJobStatus = 'queued' | 'uploading' | 'retrying' | 'paused' | 'completed' | 'failed'
 export type UploadOperation = {
@@ -30,6 +30,7 @@ type UppyFileLike = { id: string; name?: string; data?: Blob; meta?: Record<stri
 
 const jobs = ref<UploadJob[]>([])
 const runners = new Map<string, () => Promise<unknown>>()
+const activeUploads = new Map<string, Promise<unknown>>()
 const uppyId = 'couple-space-media'
 let initialized = false
 let uppy: Uppy | null = null
@@ -37,7 +38,7 @@ let uppy: Uppy | null = null
 function persist() {
   if (!import.meta.client) return
   try {
-    localStorage.setItem(queueStorageKey, JSON.stringify(jobs.value.filter(job => job.status !== 'completed').slice(-30)))
+    localStorage.setItem(uploadQueueStorageKey, JSON.stringify(jobs.value.filter(job => job.status !== 'completed').slice(-30)))
   } catch { /* best effort */ }
 }
 
@@ -91,11 +92,6 @@ function init() {
     jobs.value = restorePersistedJobs(stored) as UploadJob[]
   } catch { /* ignore malformed local queue */ }
   syncRecoveredFiles()
-  window.addEventListener('online', () => {
-    jobs.value.filter(job => job.status === 'paused' || job.status === 'retrying').forEach(job => {
-      if (!job.restored) void retry(job.id)
-    })
-  })
 }
 
 function update(id: string, patch: Partial<UploadJob>) {
@@ -158,11 +154,18 @@ export async function runQueuedUpload<T>(file: File, label: string, runner: Runn
       }
     }
   }
-  runners.set(id, execute)
-  return execute()
+  const start = () => {
+    const pending = execute().finally(() => activeUploads.delete(id))
+    activeUploads.set(id, pending)
+    return pending
+  }
+  runners.set(id, start)
+  return start()
 }
 
 export async function retry(id: string) {
+  const active = activeUploads.get(id)
+  if (active) { await active; return }
   const runner = runners.get(id)
   if (!runner) {
     update(id, { error: '文件已保存在本地恢复队列，但当前页面没有可继续的业务操作，请回到原页面重新提交' })

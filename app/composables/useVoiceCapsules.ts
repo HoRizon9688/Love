@@ -1,4 +1,4 @@
-import { createMediaSignedUrls, createMediaSignedUrl, uploadMediaResumable } from './useMediaUrls'
+import { createMediaSignedUrls, createMediaSignedUrl, mediaUploadPath, removeMediaObjects, uploadMediaResumable } from './useMediaUrls'
 import { runQueuedUpload } from './useMediaUploadQueue'
 
 export type VoiceCapsuleCategory = 'today' | 'sleep' | 'miss' | 'blessing'
@@ -79,7 +79,6 @@ export function useVoiceCapsules() {
     busy.value = true
     uploadProgress.value = 0
     error.value = ''
-    let path = ''
     try {
       const title = input.title.trim() || '给你的声音'
       const durationSeconds = Math.min(180, Math.max(1, Math.round(input.durationSeconds)))
@@ -95,30 +94,39 @@ export function useVoiceCapsules() {
         localStorage.setItem(localKey(profile.value?.coupleId || 'demo'), JSON.stringify(capsules.value))
         return item
       }
-      if (!profile.value?.coupleId || !profile.value.id) throw new Error('请先进入情侣空间')
+      const actor = profile.value
+      if (!actor?.coupleId || !actor.id) throw new Error('请先进入情侣空间')
+      const { id: authorId, coupleId } = actor
       const capsuleId = crypto.randomUUID()
       const extension = input.file.type.includes('mp4') ? 'm4a' : 'webm'
-      path = `${profile.value.coupleId}/messages/voice-capsules/${capsuleId}.${extension}`
+      const path = mediaUploadPath(`${coupleId}/messages/voice-capsules/${capsuleId}.${extension}`)
+      const ensureScope = () => {
+        if (profile.value?.id !== authorId || profile.value.coupleId !== coupleId) throw new Error('空间已切换，请重新保存录音')
+      }
       await runQueuedUpload(input.file, `声音胶囊 · ${title}`, async setProgress => {
+        ensureScope()
         const result = await uploadMediaResumable($supabase, 'message-media', path, input.file, value => { uploadProgress.value = value; setProgress(value) })
         if (result.error) throw result.error
         return path
-      }, { kind: 'voice-capsule', coupleId: profile.value.coupleId, mediaType: 'audio' })
+      }, { kind: 'voice-capsule', coupleId, mediaType: 'audio' })
+      ensureScope()
       const { data, error: insertError } = await $supabase.from('voice_capsules').insert({
-        couple_id: profile.value.coupleId,
-        author_id: profile.value.id,
+        couple_id: coupleId,
+        author_id: authorId,
         category: input.category,
         title,
         audio_path: path,
         duration_seconds: durationSeconds,
       }).select('id, author_id, category, title, audio_path, duration_seconds, created_at').single()
-      if (insertError) throw insertError
+      if (insertError) {
+        if (insertError.code) await removeMediaObjects($supabase, 'message-media', [path])
+        throw insertError
+      }
       const item = mapCapsule(data)
       item.audioUrl = await createMediaSignedUrl($supabase, path, 'message-media')
       capsules.value = [item, ...capsules.value]
       return item
     } catch (cause: any) {
-      if (path && $supabase) await $supabase.storage.from('message-media').remove([path]).catch(() => undefined)
       error.value = cause?.message || '声音胶囊保存失败'
       throw cause
     } finally { busy.value = false; uploadProgress.value = 0 }
@@ -133,7 +141,7 @@ export function useVoiceCapsules() {
     }
     const { error: deleteError } = await $supabase.from('voice_capsules').delete().eq('id', item.id).eq('author_id', profile.value!.id)
     if (deleteError) throw deleteError
-    if (item.audioPath) await $supabase.storage.from('message-media').remove([item.audioPath]).catch(() => undefined)
+    if (item.audioPath) await removeMediaObjects($supabase, 'message-media', [item.audioPath]).catch(() => undefined)
     capsules.value = capsules.value.filter(value => value.id !== item.id)
   }
 

@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { Activity, BellRing, CheckCircle2, CircleAlert, CloudOff, Database, Image, LoaderCircle, PhoneCall, RefreshCw, RotateCw, UploadCloud, UsersRound, Wifi, X } from '@lucide/vue'
+import { Activity, BellRing, CheckCircle2, CircleAlert, CloudOff, Database, Image, LoaderCircle, RefreshCw, RotateCw, UploadCloud, UsersRound, Wifi, X } from '@lucide/vue'
 import { computed, onMounted, ref } from 'vue'
 import type { SpaceServiceKey } from '~/composables/useSpaceStatus'
 
 const emit = defineEmits<{ close: []; reconnect: [] }>()
 const { profile } = useCoupleAuth()
-const { services, networkOnline, lastSyncAt, refresh, testCallService } = useSpaceStatus()
+const { services, networkOnline, lastSyncAt, refresh } = useSpaceStatus()
 const { jobs, retry } = useMediaUploadQueue()
 const checking = ref(true)
 const reconnecting = ref(false)
-const testingCall = ref(false)
 const failedJobs = computed(() => jobs.value.filter(job => job.status === 'failed'))
 const activeJobs = computed(() => jobs.value.filter(job => !['completed', 'failed'].includes(job.status)))
 const stateLabel: Record<string, string> = { checking: '检查中', ok: '正常', warning: '需处理', error: '异常', offline: '离线' }
@@ -17,7 +16,6 @@ const serviceRows: Array<{ key: SpaceServiceKey; label: string; icon: any }> = [
   { key: 'supabase', label: 'Supabase 数据库', icon: Database },
   { key: 'media', label: '私有图片服务', icon: Image },
   { key: 'push', label: '系统推送通知', icon: BellRing },
-  { key: 'call', label: '语音与视频通话', icon: PhoneCall },
 ]
 const syncLabel = computed(() => {
   if (!lastSyncAt.value) return '尚未同步'
@@ -39,10 +37,6 @@ async function reconnect() {
 async function retryAll() {
   await Promise.allSettled(failedJobs.value.map(job => retry(job.id)))
   await refreshStatus()
-}
-async function testCall() {
-  testingCall.value = true
-  try { await testCallService() } finally { testingCall.value = false }
 }
 onMounted(() => { void refreshStatus() })
 </script>
@@ -91,7 +85,6 @@ onMounted(() => { void refreshStatus() })
 
         <footer class="status-actions">
           <button type="button" @click="refreshStatus" :disabled="checking"><LoaderCircle v-if="checking" class="spin" :size="16" /><RotateCw v-else :size="16" />刷新状态</button>
-          <button type="button" @click="testCall" :disabled="testingCall"><LoaderCircle v-if="testingCall" class="spin" :size="16" /><PhoneCall v-else :size="16" />测试通话</button>
           <button class="primary" type="button" @click="reconnect" :disabled="reconnecting"><LoaderCircle v-if="reconnecting" class="spin" :size="16" /><RefreshCw v-else :size="16" />一键重新连接</button>
         </footer>
       </section>

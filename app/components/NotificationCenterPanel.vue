@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Bell, CalendarDays, CalendarClock, Camera, CheckCheck, FileHeart, HeartHandshake, ListTodo, Mail, MessageCircleHeart, Mic, Music2, PenLine, RefreshCw, Sparkles, Upload, X } from '@lucide/vue'
+import { Bell, CalendarDays, CalendarClock, Camera, CheckCheck, FileHeart, HeartHandshake, ListTodo, Mail, Mic, PenLine, RefreshCw, Upload, X } from '@lucide/vue'
 import type { AppNotification, NotificationTarget } from '~/composables/useNotificationCenter'
 import { useGSAP } from '~/composables/useGSAP'
 import { useMotionSettings } from '~/composables/useMotionSettings'
@@ -11,7 +11,6 @@ const { gsap } = useGSAP()
 const { shouldAnimate } = useMotionSettings()
 let notificationTimeline: ReturnType<typeof gsap.timeline> | undefined
 const icons = {
-  message: MessageCircleHeart,
   memory: PenLine,
   photo: Camera,
   album: Camera,
@@ -19,16 +18,13 @@ const icons = {
   list: ListTodo,
   anniversary: CalendarDays,
   letter: Mail,
-  ai: Sparkles,
   mood: HeartHandshake,
   question: FileHeart,
   voice: Mic,
-  music: Music2,
   system: Bell,
   upload: Upload,
 }
 const labels = {
-  message: '悄悄话',
   memory: '时光',
   photo: '相册',
   album: '相册',
@@ -36,11 +32,9 @@ const labels = {
   list: '共同清单',
   anniversary: '纪念日',
   letter: '情书',
-  ai: '心动 AI',
   mood: '今日心情',
   question: '每日问答',
   voice: '声音胶囊',
-  music: '一起听',
   system: '空间',
   upload: '媒体',
 }

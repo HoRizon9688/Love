@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { BellRing, CalendarHeart, Camera, Check, Copy, Heart, Info, KeyRound, Link2, LoaderCircle, LogOut, ShieldCheck, Smartphone, Unlink, X } from '@lucide/vue'
-import { getNativeOverlayPermission, isNativeAndroid, requestNativeOverlayPermission } from '~/composables/useAndroidCallControls'
+import { CalendarHeart, Camera, Check, Copy, Heart, Info, KeyRound, Link2, LoaderCircle, LogOut, ShieldCheck, Unlink, X } from '@lucide/vue'
 const emit = defineEmits<{ close: []; logout: []; unlinked: []; relationshipUpdated: [] }>()
 const { profile, updatePassword } = useCoupleAuth()
 const { relationshipStart, loadAnniversaries } = useAnniversaries()
 const { members, accountLoading, loadMembers, updateName, updateRelationshipStart, uploadAvatar, regenerateInvitation, unlinkCouple } = useAccountManagement()
 const name = ref(profile.value?.displayName || '')
 const startDate = ref(relationshipStart.value)
-const busy = ref(false); const code = ref(''); const copied = ref(false); const error = ref(''); const success = ref(''); const confirmUnlink = ref(false); const passwordOpen = ref(false); const aboutOpen = ref(false); const securityOpen = ref(false); const newPassword = ref(''); const confirmPassword = ref(''); const nativeAndroid = ref(false); const overlayGranted = ref(false)
+const busy = ref(false); const code = ref(''); const copied = ref(false); const error = ref(''); const success = ref(''); const confirmUnlink = ref(false); const passwordOpen = ref(false); const aboutOpen = ref(false); const securityOpen = ref(false); const newPassword = ref(''); const confirmPassword = ref('')
 const loginIdentity = computed(() => { const email = profile.value?.email || ''; const match = email.match(/^account\.([^@]+)@users\.love-home\.invalid$/); return match ? `账号登录 · ${match[1]}` : email ? `邮箱登录 · ${email}` : '当前登录会话' })
-onMounted(async () => { await Promise.all([loadMembers(), loadAnniversaries()]); startDate.value = relationshipStart.value; nativeAndroid.value = isNativeAndroid(); if (nativeAndroid.value) overlayGranted.value = await getNativeOverlayPermission() })
+onMounted(async () => { await Promise.all([loadMembers(), loadAnniversaries()]); startDate.value = relationshipStart.value })
 async function run(action: () => Promise<void>) { busy.value = true; error.value = ''; success.value = ''; try { await action() } catch (e: any) { error.value = e.message } finally { busy.value = false } }
 async function saveName() { if (name.value.trim()) await run(() => updateName(name.value.trim())) }
 async function saveStart() { await run(async () => { await updateRelationshipStart(startDate.value); await loadAnniversaries(); startDate.value = relationshipStart.value; success.value = '在一起的日期已更新'; emit('relationshipUpdated') }) }
@@ -18,7 +17,6 @@ async function makeCode() { await run(async () => { code.value = await regenerat
 async function copy() { await navigator.clipboard.writeText(code.value); copied.value = true; setTimeout(() => copied.value = false, 1200) }
 async function unlink() { await run(async () => { await unlinkCouple(); emit('unlinked') }) }
 async function savePassword() { if (newPassword.value.length < 8) { error.value = '新密码至少需要 8 位'; return }; if (newPassword.value !== confirmPassword.value) { error.value = '两次输入的新密码不一致'; return }; await run(async () => { await updatePassword(newPassword.value); newPassword.value = ''; confirmPassword.value = ''; passwordOpen.value = false; success.value = '密码已更新，下次登录请使用新密码' }) }
-async function openOverlaySettings() { await requestNativeOverlayPermission(); success.value = '已打开系统悬浮窗设置，请允许 Love小家显示在其他应用上层'; setTimeout(async () => { overlayGranted.value = await getNativeOverlayPermission() }, 700) }
 </script>
 
 <template>
@@ -26,9 +24,9 @@ async function openOverlaySettings() { await requestNativeOverlayPermission(); s
     <header><div><p class="eyebrow">OUR ACCOUNT</p><h2>双人账户</h2></div><button type="button" aria-label="关闭" @click="emit('close')"><X :size="20" /></button></header>
     <div v-if="accountLoading" class="loading"><LoaderCircle class="spin" :size="22" /> 正在读取成员</div>
     <div v-else class="members"><article v-for="member in members" :key="member.id"><div class="member-avatar"><img v-if="member.avatarUrl" :src="member.avatarUrl" alt="成员头像"><span v-else>{{ member.displayName.slice(0, 1) }}</span><label v-if="member.id === profile?.id" title="更换头像"><Camera :size="14" /><input type="file" accept="image/jpeg,image/png,image/webp" hidden @change="chooseAvatar"></label></div><div><strong>{{ member.displayName }}</strong><small>{{ member.id === profile?.id ? '这是你' : '你的伴侣' }}</small></div><ShieldCheck v-if="member.id === profile?.id" :size="17" /></article></div>
+    <section class="setting-section"><SpaceThemePicker /></section>
     <section class="setting-section"><h3>我的称呼</h3><div class="name-row"><input v-model="name" maxlength="40"><button type="button" :disabled="busy" @click="saveName"><Check :size="16" />保存</button></div></section>
     <section class="setting-section"><h3>账户安全</h3><div class="account-identity"><ShieldCheck :size="19" /><div><strong>{{ loginIdentity }}</strong><span>密码不会在系统中显示，只能修改或重置。</span></div></div><button class="outline-action" type="button" @click="passwordOpen = !passwordOpen"><KeyRound :size="17" />{{ passwordOpen ? '收起密码修改' : '修改登录密码' }}</button><button class="outline-action security-entry" type="button" @click="securityOpen = true"><ShieldCheck :size="17" />打开账户安全中心</button><div v-if="passwordOpen" class="password-form"><label>新密码<input v-model="newPassword" type="password" autocomplete="new-password" placeholder="至少 8 位"></label><label>确认新密码<input v-model="confirmPassword" type="password" autocomplete="new-password" placeholder="再次输入新密码"></label><button type="button" :disabled="busy" @click="savePassword"><LoaderCircle v-if="busy" class="spin" :size="16" /><Check v-else :size="16" />保存新密码</button></div></section>
-    <section class="setting-section"><h3>通话权限</h3><div class="call-permission-card"><div><strong><Smartphone :size="16" /> Android 通话服务</strong><span>视频通话会申请摄像头和麦克风；通话期间使用系统前台服务，锁屏后保持连接。</span></div><BellRing :size="18" /></div><button v-if="nativeAndroid" class="outline-action" type="button" @click="openOverlaySettings"><Smartphone :size="17" />{{ overlayGranted ? '系统悬浮窗已开启' : '开启系统悬浮窗权限' }}</button><p v-if="!nativeAndroid" class="permission-note">安装 Android 版本后，这里可以开启来电悬浮窗。网页端使用浏览器通知。</p></section>
     <section class="setting-section"><h3>在一起的日期</h3><p>修改后，双方首页和纪念日的实时计时会同步更新。</p><div class="date-row"><CalendarHeart :size="19" /><input v-model="startDate" type="date" :max="new Date().toISOString().slice(0, 10)"><button type="button" :disabled="busy" @click="saveStart"><Check :size="16" />更新</button></div></section>
     <section class="setting-section"><h3>邀请伴侣</h3><p>邀请码有效期为 7 天，重新生成后旧码失效。</p><button v-if="!code" class="outline-action" type="button" :disabled="busy" @click="makeCode"><Link2 :size="17" />生成新邀请码</button><button v-else class="invite-code" type="button" @click="copy"><strong>{{ code }}</strong><Copy :size="17" /><span>{{ copied ? '已复制' : '复制' }}</span></button></section>
     <section class="setting-section about-entry"><button class="about-entry-button" type="button" @click="aboutOpen = true"><Info :size="17" /><span><strong>关于 Love小家</strong><small>版本、开发者、隐私与开源信息</small></span><span class="about-chevron">›</span></button></section>

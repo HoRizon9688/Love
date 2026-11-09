@@ -1,7 +1,5 @@
 import { daysUntil, useAnniversaries } from './useAnniversaries'
-import { useHeartAi, type AiSavedWork } from './useHeartAi'
 import { useMediaUploadQueue, type UploadJob } from './useMediaUploadQueue'
-import { useMessages } from './useMessages'
 import { useActivityFeed, type ActivityKind, type ActivityTarget } from './useActivityFeed'
 import type { Component } from 'vue'
 
@@ -19,8 +17,6 @@ export type AppNotification = {
 }
 
 const readIds = ref<string[]>([])
-const aiWorks = ref<AiSavedWork[]>([])
-const aiLoading = ref(false)
 const initialized = ref(false)
 
 function readStorageKey(coupleId?: string, userId?: string) {
@@ -61,9 +57,7 @@ function uploadBody(job: UploadJob) {
 
 export function useNotificationCenter() {
   const { profile } = useCoupleAuth()
-  const { messages } = useMessages()
   const { anniversaries } = useAnniversaries()
-  const { loadWorks } = useHeartAi()
   const { jobs } = useMediaUploadQueue()
   const activity = useActivityFeed()
   let startedScope = ''
@@ -79,13 +73,6 @@ export function useNotificationCenter() {
     }
   }
 
-  async function refreshAiWorks() {
-    if (aiLoading.value) return
-    aiLoading.value = true
-    try { aiWorks.value = await loadWorks() } catch { /* AI is optional; other notifications remain available. */ }
-    finally { aiLoading.value = false }
-  }
-
   watch(() => `${profile.value?.coupleId || ''}:${profile.value?.id || ''}`, scopeKey => {
     const coupleId = profile.value?.coupleId || ''
     if (!coupleId) {
@@ -99,7 +86,6 @@ export function useNotificationCenter() {
     const scope = currentScope()
     loadReadIds(scope.coupleId, scope.userId)
     void activity.start()
-    void refreshAiWorks()
   }, { immediate: true })
 
   const notifications = computed<AppNotification[]>(() => {
@@ -122,21 +108,6 @@ export function useNotificationCenter() {
         })
       })
 
-    messages.value
-      .filter(message => message.senderId !== ownId && !message.readAt)
-      .slice(-8)
-      .reverse()
-      .filter(message => !activityEntityIds.has(`message:${message.id}`))
-      .forEach(message => result.push({
-        id: `message:${message.id}`,
-        type: 'message',
-        title: '新的悄悄话',
-        body: shortText(message.content, message.mediaType === 'image' ? 'TA 发来了一张照片' : message.mediaType === 'video' ? 'TA 发来了一段视频' : message.mediaType === 'audio' ? 'TA 发来了一条语音' : 'TA 发来了一条消息'),
-        createdAt: message.createdAt,
-        target: '悄悄话',
-        read: isRead(`message:${message.id}`),
-      }))
-
     anniversaries.value
       .filter(event => daysUntil(event) <= 30)
       .slice(0, 3)
@@ -146,16 +117,9 @@ export function useNotificationCenter() {
         result.push({ id, type: 'anniversary', title: event.title, body: daysUntil(event) === 0 ? '就是今天，记得给 TA 一个拥抱。' : `还有 ${daysUntil(event)} 天，一起期待这个特别的日子。`, createdAt: new Date().toISOString(), target: '纪念日', read: isRead(id) })
       })
 
-    aiWorks.value.slice(0, 8)
-      .filter(work => !activityEntityIds.has(`ai:${work.id}`))
-      .forEach(work => {
-      const id = `ai:${work.id}`
-      result.push({ id, type: 'ai', title: work.kind === 'love_letter' ? '情书已保存' : work.kind === 'diary' ? '今日日记已保存' : '约会方案已保存', body: shortText(work.title || work.content, '点击查看 AI 内容'), createdAt: work.createdAt, target: '心动AI', read: isRead(id) })
-    })
-
-    jobs.value.filter(job => job.status === 'failed' || job.status === 'uploading' || job.status === 'retrying' || job.status === 'paused').slice(-6).reverse().forEach(job => {
+    jobs.value.filter(job => job.operation?.kind !== 'message' && ['failed', 'uploading', 'retrying', 'paused'].includes(job.status)).slice(-6).reverse().forEach(job => {
       const id = `upload:${job.id}`
-      result.push({ id, type: 'upload', title: job.status === 'failed' ? '上传失败' : '上传进行中', body: uploadBody(job), createdAt: job.createdAt, target: job.operation?.kind === 'message' ? '悄悄话' : job.operation?.kind === 'memory' ? '时光' : '相册', read: isRead(id) })
+      result.push({ id, type: 'upload', title: job.status === 'failed' ? '上传失败' : '上传进行中', body: uploadBody(job), createdAt: job.createdAt, target: job.operation?.kind === 'memory' ? '时光' : '相册', read: isRead(id) })
     })
 
     return result.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
@@ -175,5 +139,5 @@ export function useNotificationCenter() {
     persistReadIds(scope.coupleId, scope.userId)
   }
 
-  return { notifications, unreadCount, aiLoading, activityEvents: activity.events, refreshAiWorks, markRead, markAllRead, clearReadHistory }
+  return { notifications, unreadCount, loading: activity.loading, refresh: activity.load, markRead, markAllRead, clearReadHistory }
 }

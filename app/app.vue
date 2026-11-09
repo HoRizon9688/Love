@@ -1,39 +1,28 @@
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
 import '@fontsource-variable/manrope'
 import '@fontsource-variable/nunito-sans'
 import HomePage from './components/HomePage.vue'
 import {
-  Activity,
   Calendar,
   CalendarDays,
-  ChevronRight,
   Heart,
   Home,
   Image,
   ListChecks,
-  MessageCircleHeart,
-  Music2,
-  X,
   Settings,
   History,
-  BrainCircuit,
-  Radio,
-  StopCircle,
-  Volume2,
-  VolumeX,
   WifiOff,
   RefreshCw,
-  Bell,
 } from '@lucide/vue'
-import { notifySystem, requestSystemAlerts } from './composables/useSystemAlerts'
 import { createMediaSignedUrl, refreshMediaElement, revealVideoFrame } from './composables/useMediaUrls'
 import { useGSAP } from './composables/useGSAP'
 import { useMotionSettings } from './composables/useMotionSettings'
 
-const CallScreen = defineAsyncComponent(() => import('./components/CallScreen.vue'))
-const HeartAiView = defineAsyncComponent(() => import('./components/HeartAiView.vue'))
-const ListenTogetherView = defineAsyncComponent(() => import('./components/ListenTogetherView.vue'))
+const { theme, selectedTheme } = useSpaceTheme()
+useHead({
+  htmlAttrs: { 'data-space-theme': theme },
+  meta: [{ name: 'theme-color', content: computed(() => selectedTheme.value.swatches[0]) }],
+})
 
 const navItems = [
   { label: '首页', icon: Home },
@@ -42,9 +31,6 @@ const navItems = [
   { label: '清单', icon: ListChecks },
   { label: '纪念日', icon: CalendarDays },
   { label: '日历', icon: Calendar },
-  { label: '悄悄话', icon: MessageCircleHeart },
-  { label: '心动AI', icon: BrainCircuit },
-  { label: '一起听', icon: Music2 },
 ]
 const NAV_STORAGE_KEY = 'couplespace-active-nav'
 const NAV_LABELS = new Set(navItems.map(item => item.label))
@@ -69,9 +55,6 @@ const romanceGiftMode = ref<'opening' | 'story'>('opening')
 const futureMailboxVisible = ref(false)
 const voiceCapsuleVisible = ref(false)
 const easterEggVisible = ref(false)
-const chatVisible = ref(false)
-const messageToast = ref<{ sender: string; content: string } | null>(null)
-let messageToastTimer: ReturnType<typeof setTimeout> | undefined
 const { stage, profile, initialize, signOut } = useCoupleAuth()
 const { anniversaries, relationshipStart, loveDays, nextAnniversary, loadAnniversaries } = useAnniversaries()
 const { sync: syncAnniversaryReminders } = useAnniversaryReminders()
@@ -80,11 +63,7 @@ const { allPhotos, loadAlbums, subscribeAlbumPhotos, disconnectAlbumPhotos } = u
 const { items: togetherItems, loadItems } = useTogetherList()
 const { members, loadMembers, subscribeMembers, disconnectMembers } = useAccountManagement()
 const { partnerOnline, connectPresence, disconnectPresence } = useCouplePresence()
-const { messages, unreadCount, loadMessages, subscribe: subscribeMessages, markRead, disconnect: disconnectMessages } = useMessages()
-const { callStatus, ensureChannel: ensureCallChannel, disconnectCall } = useCoupleCall()
-const { liveStatus, liveError, liveRemoteMuted, liveRemoteName, liveNeedsGesture, ensureLiveChannel, stopLive, dismissLive, resumeLiveAudio, disconnectLive } = useCoupleLiveMic()
-const { register: registerPushNotifications } = usePushNotifications()
-const { notifications, unreadCount: notificationUnreadCount, aiLoading: notificationAiLoading, refreshAiWorks, markRead: markNotificationRead, markAllRead: markAllNotificationsRead } = useNotificationCenter()
+const { notifications, unreadCount: notificationUnreadCount, loading: notificationLoading, refresh: refreshNotifications, markRead: markNotificationRead, markAllRead: markAllNotificationsRead } = useNotificationCenter()
 const { validate: validateStoryShare } = useStoryShare()
 const { $supabase } = useNuxtApp()
 
@@ -93,7 +72,6 @@ const partnerMember = computed(() => members.value.find(m => m.id !== profile.va
 
 let pairedBootstrapStarted = false
 let romanceOpeningTimer: ReturnType<typeof setTimeout> | undefined
-let deferredBootstrapTimer: ReturnType<typeof setTimeout> | undefined
 
 function settleWithin<T>(promise: Promise<T>, timeout = 7000) {
   return Promise.race([
@@ -117,39 +95,22 @@ async function loadHomeData() {
     subscribeAlbumPhotos(),
     syncAnniversaryReminders(anniversaries.value),
     connectPresence(),
-    loadMessages(),
-    subscribeMessages(),
   ].map(task => settleWithin(task)))
 }
 
 function handleCoupleActivity(event: Event) {
   const detail = (event as CustomEvent).detail as { actorId?: string; target?: string } | undefined
   if (!detail || detail.actorId === profile.value?.id) return
-  if (detail.target === '悄悄话') void loadMessages()
-  else if (detail.target === '时光') void loadMemories()
+  if (detail.target === '时光') void loadMemories()
   else if (detail.target === '相册') void loadAlbums(true)
   else if (detail.target === '清单') void loadItems()
   else if (detail.target === '纪念日') void loadAnniversaries()
-  else if (detail.target === '心动AI') void refreshAiWorks()
 }
 
 function startPairedBootstrap() {
   if (pairedBootstrapStarted) return
   pairedBootstrapStarted = true
   void loadHomeData().catch(() => undefined)
-  // Calls, microphone signaling, and native push registration are not needed
-  // to render the first screen. Starting them after the initial data burst
-  // keeps mobile login and check-in responsive on high-latency networks.
-  const startDeferredServices = () => {
-    void settleWithin(ensureCallChannel().catch(() => undefined), 5000)
-    void settleWithin(ensureLiveChannel().catch(() => undefined), 5000)
-    void registerPushNotifications()
-  }
-  if (import.meta.client && 'requestIdleCallback' in window) {
-    ;(window as Window & { requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number }).requestIdleCallback?.(startDeferredServices, { timeout: 1800 })
-  } else {
-    deferredBootstrapTimer = setTimeout(startDeferredServices, 1200)
-  }
 }
 
 function maybeShowFirstRunChecklist() {
@@ -217,16 +178,11 @@ function openInviteSettings() {
 async function reconnectSpaceServices() {
   await Promise.allSettled([
     connectPresence(),
-    subscribeMessages(),
     subscribeAlbumPhotos(),
-    ensureCallChannel(),
-    ensureLiveChannel(),
   ])
 }
 
 onMounted(async () => {
-  // Keep the selected workspace stable if an async feature causes the shell
-  // to be recreated. Music playback must never appear to send the user home.
   const savedNav = localStorage.getItem(NAV_STORAGE_KEY)
   if (savedNav && NAV_LABELS.has(savedNav)) activeNav.value = savedNav
   syncOnlineState()
@@ -258,35 +214,22 @@ watch(stage, async value => {
     maybeShowRomanceExperience()
   } else {
     pairedBootstrapStarted = false
-    await disconnectCall()
-    await disconnectLive()
     await disconnectPresence()
-    await disconnectMessages()
     await disconnectMembers()
     await disconnectAlbumPhotos()
   }
 })
-watch(callStatus, value => { if (value === 'ringing') chatVisible.value = true })
-watch(() => messages.value.length, (length, previousLength) => {
-  if (!appReady.value || length <= previousLength || chatVisible.value || activeNav.value === '悄悄话') return
-  const message = messages.value[length - 1]
-  if (!message || message.senderId === profile.value?.id) return
-  const sender = partnerMember.value?.displayName || 'TA'
-  const content = message.content || (message.mediaType === 'image' ? '发来了一张照片' : message.mediaType === 'video' ? '发来了一段视频' : message.mediaType === 'audio' ? '发来了一条语音' : '发来了一条消息')
-  messageToast.value = { sender, content }
-  void notifySystem(`${sender} 发来悄悄话`, content, 2002)
-  if (messageToastTimer) clearTimeout(messageToastTimer)
-  messageToastTimer = setTimeout(() => { messageToast.value = null }, 5000)
-})
 const firstRunHasMedia = computed(() => allPhotos.value.length > 0)
-onBeforeUnmount(async () => { pageMotionContext?.revert(); if (romanceOpeningTimer) clearTimeout(romanceOpeningTimer); if (deferredBootstrapTimer) clearTimeout(deferredBootstrapTimer); window.removeEventListener('couple-space:activity', handleCoupleActivity); window.removeEventListener('online', syncOnlineState); window.removeEventListener('offline', syncOnlineState); await disconnectCall(); await disconnectLive(); await disconnectPresence(); await disconnectMessages(); await disconnectMembers(); await disconnectAlbumPhotos() })
-
-async function openChat() {
-  messageToast.value = null
-  chatVisible.value = true
-  void requestSystemAlerts()
-  await markRead()
-}
+onBeforeUnmount(async () => {
+  pageMotionContext?.revert()
+  if (romanceOpeningTimer) clearTimeout(romanceOpeningTimer)
+  window.removeEventListener('couple-space:activity', handleCoupleActivity)
+  window.removeEventListener('online', syncOnlineState)
+  window.removeEventListener('offline', syncOnlineState)
+  await disconnectPresence()
+  await disconnectMembers()
+  await disconnectAlbumPhotos()
+})
 
 async function leaveSpace() {
   await signOut()
@@ -335,14 +278,12 @@ function selectNav(label: string) {
     voiceCapsuleVisible.value = true
     return
   }
-  if (label === '悄悄话') chatVisible.value = false
-  activeNav.value = label
+  if (NAV_LABELS.has(label)) activeNav.value = label
 }
 
 function navigateFromNotification(label: string) {
   notificationVisible.value = false
-  activeNav.value = label
-  if (label === '悄悄话') chatVisible.value = false
+  selectNav(label)
 }
 
 function retryPage() {
@@ -367,7 +308,7 @@ function animatePageEnter(element: Element, done: () => void) {
     return
   }
   pageMotionContext = context(element, () => {
-    const introNodes = element.querySelectorAll('.topbar, .hero-section, .quote-stage, .timeline-header, .timeline-summary, .album-header, .album-filters, .style-panel, .heart-ai > header, .heart-ai > nav')
+    const introNodes = element.querySelectorAll('.topbar, .hero-section, .quote-stage, .timeline-header, .timeline-summary, .album-header, .album-filters, .style-panel')
     if (introNodes.length) {
       gsap.fromTo(introNodes, { autoAlpha: 0, y: 18 }, {
         autoAlpha: 1,
@@ -446,15 +387,6 @@ watch(activeNav, () => {
     <div v-if="isOffline" class="offline-banner" role="status"><WifiOff :size="16" /><span>当前处于离线状态，恢复网络后会自动同步</span><button type="button" aria-label="重新检查网络" title="重新检查" @click="syncOnlineState"><RefreshCw :size="15" /></button></div>
     <AnniversaryReminderButton v-if="activeNav === '纪念日'" />
     <FirstRunOnboarding v-if="firstRunChecklistVisible" phase="checklist" :display-name="profile?.displayName" :has-partner="Boolean(partnerMember)" :has-media="firstRunHasMedia" @complete="completeFirstRunChecklist" @upload-photo="openFirstPhotoUpload" @invite-partner="openInviteSettings" />
-    <button v-if="messageToast" class="message-toast" type="button" @click="openChat"><MessageCircleHeart :size="20"/><span><strong>{{messageToast.sender}} 发来悄悄话</strong><small>{{messageToast.content}}</small></span><ChevronRight :size="17"/></button>
-    <div v-if="liveStatus !== 'idle'" class="live-status-capsule" :class="{broadcasting: liveStatus === 'broadcasting'}">
-      <span class="live-status-icon"><Radio :size="17" /></span>
-      <span class="live-status-copy"><strong>{{ liveStatus === 'broadcasting' ? '你正在开麦' : `${liveRemoteName} 正在开麦` }}</strong><small>{{ liveStatus === 'broadcasting' ? '对方无需接听即可收听' : (liveRemoteMuted ? '对方暂时静音' : '正在后台收听') }}</small></span>
-      <button v-if="liveStatus === 'listening' && liveNeedsGesture" type="button" title="播放开麦声音" @click="resumeLiveAudio"><Volume2 :size="16" /></button>
-      <button v-else type="button" :title="liveStatus === 'broadcasting' ? '结束开麦' : '停止收听'" @click="liveStatus === 'broadcasting' ? stopLive() : dismissLive()"><StopCircle v-if="liveStatus === 'broadcasting'" :size="16" /><VolumeX v-else :size="16" /></button>
-    </div>
-    <p v-if="liveError" class="live-status-error">{{ liveError }}</p>
-
     <aside class="sidebar glass-panel" aria-label="主要导航">
       <button class="couple-mark" type="button" aria-label="我们的主页">
         <span class="avatar avatar-left"><img v-if="selfMember?.avatarUrl" :src="selfMember.avatarUrl" alt="我的头像"><template v-else>{{ selfMember?.displayName?.slice(0, 1) || '我' }}</template></span>
@@ -476,7 +408,6 @@ watch(activeNav, () => {
         >
           <component :is="item.icon" :size="21" :stroke-width="1.8" />
           <span>{{ item.label }}</span>
-          <strong v-if="item.label === '悄悄话' && unreadCount" class="nav-unread">{{ unreadCount > 9 ? '9+' : unreadCount }}</strong>
         </button>
       </nav>
 
@@ -493,10 +424,7 @@ watch(activeNav, () => {
     <main v-else-if="activeNav === '相册'" class="main-content"><NuxtErrorBoundary :key="pageRenderKey" @error="pageError = $event.message"><Suspense><LazyAlbumView @back="selectNav('首页')" /><template #fallback><div class="page-skeleton"><i /><i /><i /></div></template></Suspense><template #error><div class="page-error"><h2>相册暂时无法打开</h2><p>{{ pageError }}</p><button type="button" @click="retryPage">重新加载</button></div></template></NuxtErrorBoundary></main>
     <main v-else-if="activeNav === '清单'" class="main-content"><NuxtErrorBoundary :key="pageRenderKey" @error="pageError = $event.message"><Suspense><LazyTogetherListView @back="selectNav('首页')" /><template #fallback><div class="page-skeleton"><i /><i /><i /></div></template></Suspense><template #error><div class="page-error"><h2>清单暂时无法打开</h2><p>{{ pageError }}</p><button type="button" @click="retryPage">重新加载</button></div></template></NuxtErrorBoundary></main>
     <main v-else-if="activeNav === '纪念日'" class="main-content"><NuxtErrorBoundary :key="pageRenderKey" @error="pageError = $event.message"><Suspense><LazyAnniversaryView @back="selectNav('首页')" /><template #fallback><div class="page-skeleton"><i /><i /><i /></div></template></Suspense><template #error><div class="page-error"><h2>纪念日暂时无法打开</h2><p>{{ pageError }}</p><button type="button" @click="retryPage">重新加载</button></div></template></NuxtErrorBoundary></main>
-    <main v-else-if="activeNav === '悄悄话'" class="main-content chat-main"><NuxtErrorBoundary :key="pageRenderKey" @error="pageError = $event.message"><Suspense><LazyChatPanel mode="page" @close="selectNav('首页')" /><template #fallback><div class="page-skeleton"><i /><i /><i /></div></template></Suspense><template #error><div class="page-error"><h2>悄悄话暂时无法打开</h2><p>{{ pageError }}</p><button type="button" @click="retryPage">重新加载</button></div></template></NuxtErrorBoundary></main>
-     <main v-else-if="activeNav === '心动AI'" class="main-content"><NuxtErrorBoundary :key="pageRenderKey" @error="pageError = $event.message"><HeartAiView @back="selectNav('首页')" /><template #error><div class="page-error"><h2>心动 AI 暂时无法打开</h2><p>{{ pageError }}</p><button type="button" @click="retryPage">重新加载</button></div></template></NuxtErrorBoundary></main>
      <main v-else-if="activeNav === '日历'" class="main-content"><SharedCalendarView /></main>
-     <main v-else-if="activeNav === '一起听'" class="main-content"><NuxtErrorBoundary :key="pageRenderKey" @error="pageError = $event.message"><ListenTogetherView /><template #error><div class="page-error"><h2>一起听暂时无法打开</h2><p>{{ pageError }}</p><button type="button" @click="retryPage">重新加载</button></div></template></NuxtErrorBoundary></main>
     <main v-else class="main-content" />
       </div>
     </Transition>
@@ -513,15 +441,12 @@ watch(activeNav, () => {
       >
         <component :is="item.icon" :size="21" />
         <span>{{ item.label }}</span>
-        <strong v-if="item.label === '悄悄话' && unreadCount" class="nav-unread">{{ unreadCount > 9 ? '9+' : unreadCount }}</strong>
       </button>
     </nav>
 
     <Transition name="layer" appear><LazyAccountPanel v-if="accountVisible" @close="accountVisible = false" @logout="leaveSpace" @unlinked="handleUnlinked" @relationship-updated="loadHomeData" /></Transition>
-    <Transition name="layer"><LazyChatPanel v-if="chatVisible" mode="drawer" @close="chatVisible = false" /></Transition>
-    <Transition name="layer"><CallScreen v-if="callStatus !== 'idle'" :partner="partnerMember" @minimized="chatVisible = false" /></Transition>
     <Transition name="layer"><LazySpaceStatusPanel v-if="spaceStatusVisible" @close="spaceStatusVisible = false" @reconnect="reconnectSpaceServices" /></Transition>
-    <Transition name="layer"><NotificationCenterPanel v-if="notificationVisible" :notifications="notifications" :unread-count="notificationUnreadCount" :loading="notificationAiLoading" @close="notificationVisible = false" @read="markNotificationRead" @read-all="markAllNotificationsRead" @navigate="navigateFromNotification" @refresh="refreshAiWorks" /></Transition>
+    <Transition name="layer"><NotificationCenterPanel v-if="notificationVisible" :notifications="notifications" :unread-count="notificationUnreadCount" :loading="notificationLoading" @close="notificationVisible = false" @read="markNotificationRead" @read-all="markAllNotificationsRead" @navigate="navigateFromNotification" @refresh="refreshNotifications" /></Transition>
     <Transition name="layer"><RomanceGiftExperience v-if="romanceGiftVisible" :mode="romanceGiftMode" @close="closeRomanceExperience" /></Transition>
     <Transition name="layer"><FutureMailboxPanel v-if="futureMailboxVisible" @close="futureMailboxVisible = false" /></Transition>
     <Transition name="layer"><VoiceCapsulePanel v-if="voiceCapsuleVisible" @close="voiceCapsuleVisible = false" /></Transition>
@@ -732,7 +657,7 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
   .hero-section { grid-template-columns: 1fr 1fr; }
   .hero-copy { padding: 36px 28px; }
   .hero-copy h2 strong { font-size: 56px; }
-  .mobile-nav { position: fixed; z-index: 30; right: 14px; bottom: max(12px, env(safe-area-inset-bottom)); left: 14px; display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); align-items: center; height: 72px; padding: 8px; border-radius: 24px; }
+  .mobile-nav { position: fixed; z-index: 30; right: 14px; bottom: max(12px, env(safe-area-inset-bottom)); left: 14px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: center; height: 72px; padding: 8px; border-radius: 24px; }
   .mobile-nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; min-height: 52px; height: 52px; padding: 3px 1px; border: 0; border-radius: 15px; background: transparent; color: #9991a2; }
   .mobile-nav-button svg { width: 18px; height: 18px; flex: 0 0 auto; }
   .mobile-nav-button span { max-width: 100%; overflow: hidden; font-size: 9px; font-weight: 700; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
@@ -1133,3 +1058,5 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
   background: linear-gradient(145deg, rgba(102,114,184,.78), rgba(139,116,187,.66) 54%, rgba(52,59,117,.68)) !important;
 }
 </style>
+
+<style src="./assets/space-themes.css"></style>

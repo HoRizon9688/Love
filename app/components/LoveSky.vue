@@ -25,7 +25,7 @@ const pieces = Array.from({ length: 120 }, (_, index) => {
     midY: `${Math.round(startY * -0.35 * 10) / 10}vh`,
     tilt: `${tilt}deg`,
     inverseTilt: `${-tilt}deg`,
-    color: index % 3 === 0 ? '#d281d6' : index % 3 === 1 ? '#ef8fb8' : '#b88bdd',
+    color: 'var(--theme-spark-' + (index % 3 + 1) + ')',
     opacity: 0.12 + (seed % 8) * 0.018,
   }
 })

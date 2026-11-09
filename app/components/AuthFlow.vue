@@ -26,6 +26,9 @@ const coupleName = ref('我们的空间')
 const relationshipStart = ref('2023-01-02')
 const inviteCode = ref('')
 const generatedCode = ref('')
+const inviteCodeGroups = computed(() => /^[a-f0-9]{32}$/i.test(generatedCode.value)
+  ? generatedCode.value.match(/.{8}/g)
+  : [generatedCode.value])
 const errorMessage = ref('')
 const copied = ref(false)
 const resendStatus = ref('')
@@ -118,7 +121,7 @@ async function enterCreatedSpace() {
 
 async function submitJoin() {
   errorMessage.value = ''
-  try { await joinCouple(inviteCode.value); emit('complete') }
+  try { await joinCouple(inviteCode.value.replace(/\s/g, '')); emit('complete') }
   catch (error: any) { errorMessage.value = error.message || '绑定失败' }
 }
 
@@ -214,13 +217,18 @@ async function resendEmail() {
         </form>
         <div v-else-if="generatedCode" class="invite-result">
           <span class="success-icon"><Check :size="24" /></span><h3>空间创建好了</h3><p>把下面的邀请码发给另一半，有效期为 7 天。</p>
-          <button class="code-box" type="button" @click="copyCode"><strong>{{ generatedCode }}</strong><Copy :size="18" /></button>
-          <small>{{ copied ? '已复制到剪贴板' : '点击复制邀请码' }}</small>
-          <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
-          <button class="auth-submit" type="button" :disabled="loading" @click="enterCreatedSpace">先进入空间</button>
+          <div class="invite-actions">
+            <button class="code-box" type="button" aria-label="复制邀请码" @click="copyCode">
+              <strong><span v-for="(group, index) in inviteCodeGroups" :key="index">{{ group }}</span></strong>
+              <Copy :size="18" aria-hidden="true" />
+            </button>
+            <small role="status">{{ copied ? '已复制到剪贴板' : '点击复制邀请码' }}</small>
+            <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
+            <button class="auth-submit" type="button" :disabled="loading" @click="enterCreatedSpace">先进入空间</button>
+          </div>
         </div>
         <form v-else class="auth-form" @submit.prevent="submitJoin">
-          <label><span>专属邀请码</span><div><Link2 :size="18" /><input v-model="inviteCode" maxlength="32" placeholder="粘贴伴侣发来的邀请码"></div></label>
+          <label><span>专属邀请码</span><div><Link2 :size="18" /><input v-model="inviteCode" maxlength="35" placeholder="粘贴伴侣发来的邀请码"></div></label>
           <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
           <button class="auth-submit" type="submit" :disabled="loading">确认绑定</button>
         </form>
@@ -511,7 +519,19 @@ async function resendEmail() {
 .invite-result p { margin: 0 0 20px; color: #89818f; font-size: 12px; }
 .code-box { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 65px; border: 1px dashed #bba9d6; border-radius: 17px; background: #f6f2fb; color: #71569a; cursor: pointer; }
 .code-box strong { font-size: 22px; letter-spacing: .12em; }
-.invite-result .code-box strong { min-width: 0; overflow-wrap: anywhere; }
+.invite-actions { width: min(100%, 420px); margin-inline: auto; }
+.invite-result .code-box { min-height: 54px; padding: 12px; }
+.invite-result .code-box strong {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 9px;
+  min-width: 0;
+  font: 700 clamp(12px, 2.7vw, 15px)/1.5 ui-monospace, Consolas, monospace;
+  letter-spacing: .035em;
+}
+.invite-actions .auth-submit { width: 100%; justify-content: center; }
+#auth-single-card .invite-actions .auth-submit:hover { transform: none; }
 .invite-result .code-box svg { flex-shrink: 0; }
 .invite-result small { display: block; margin: 9px 0 16px; color: #9991a2; font-size: 10px; }
 .spin { animation: spin 1s linear infinite; }

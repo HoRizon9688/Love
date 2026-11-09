@@ -28,7 +28,6 @@ const { anniversaries, relationshipStart, nextAnniversary } = useAnniversaries()
 const { memories } = useMemories()
 const { allPhotos } = useAlbums()
 const { items: togetherItems, toggleItem } = useTogetherList()
-const { unreadCount } = useMessages()
 const { unreadCount: notificationUnreadCount } = useNotificationCenter()
 const { $supabase } = useNuxtApp()
 

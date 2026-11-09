@@ -1,5 +1,4 @@
 export type ActivityKind =
-  | 'message'
   | 'memory'
   | 'photo'
   | 'album'
@@ -7,14 +6,12 @@ export type ActivityKind =
   | 'list'
   | 'anniversary'
   | 'letter'
-  | 'ai'
   | 'mood'
   | 'question'
   | 'voice'
-  | 'music'
   | 'system'
 
-export type ActivityTarget = '首页' | '悄悄话' | '时光' | '相册' | '清单' | '纪念日' | '日历' | '心动AI' | '一起听'
+export type ActivityTarget = '首页' | '时光' | '相册' | '清单' | '纪念日' | '日历' | '声音胶囊'
 
 export type ActivityEvent = {
   id: string
@@ -37,13 +34,17 @@ let reconnectAttempt = 0
 let intentionallyStopped = false
 let startingPromise: Promise<void> | null = null
 
+function isRemovedActivity(row: { kind?: string }) {
+  return row.kind === 'message' || row.kind === 'ai' || row.kind === 'music'
+}
+
 function mapRow(row: any): ActivityEvent {
   return {
     id: String(row?.id || ''),
     coupleId: String(row?.couple_id || ''),
     actorId: String(row?.actor_id || ''),
     kind: (row?.kind || 'system') as ActivityKind,
-    target: (row?.target || '首页') as ActivityTarget,
+    target: (row?.kind === 'voice' ? '声音胶囊' : row?.kind === 'letter' ? '首页' : row?.target || '首页') as ActivityTarget,
     entityId: String(row?.entity_id || ''),
     title: String(row?.title || '空间有新动态'),
     body: String(row?.body || ''),
@@ -85,13 +86,14 @@ export function useActivityFeed() {
     try {
       if (!$supabase || demoMode.value) {
         const raw = localStorage.getItem(`couple-space-activity:${coupleId}`)
-        events.value = raw ? JSON.parse(raw).map(mapRow) : []
+        events.value = raw ? JSON.parse(raw).filter((row: { kind?: string }) => !isRemovedActivity(row)).map(mapRow) : []
         return true
       }
       const { data, error } = await $supabase
         .from('activity_events')
         .select('id, couple_id, actor_id, kind, target, entity_id, title, body, created_at')
         .eq('couple_id', coupleId)
+        .not('kind', 'in', '(message,ai,music)')
         .order('created_at', { ascending: false })
         .limit(150)
       if (error) throw error
@@ -126,7 +128,7 @@ export function useActivityFeed() {
             schema: 'public',
             table: 'activity_events',
             filter: `couple_id=eq.${activeCoupleId}`,
-          }, (payload: any) => append(mapRow(payload.new)))
+          }, (payload: any) => { if (!isRemovedActivity(payload.new)) append(mapRow(payload.new)) })
         activityChannel = channel
         channel.subscribe((status: string) => {
           if (activityChannel !== channel) return

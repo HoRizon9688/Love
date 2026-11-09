@@ -1,0 +1,181 @@
+/* Shared tokens live on html so dialogs teleported to body inherit the theme. */
+:root,
+html[data-space-theme="apricot"] {
+  --bg: #fff3e9;
+  --ink: #43291f;
+  --muted: #755449;
+  --surface-solid: #fffaf5;
+  --surface: rgba(255, 250, 245, .86);
+  --line: #ecd3c5;
+  --theme-accent: #9f4534;
+  --theme-accent-end: #ae5143;
+  --theme-soft: #fae3d5;
+  --theme-hero: linear-gradient(124deg, #ffe6d6, #f4c3ad);
+  --theme-backdrop: radial-gradient(ellipse at 90% 4%, #f7ceba 0, transparent 45%), var(--bg);
+  --theme-radius: 23px;
+  --theme-blur: blur(12px);
+  --theme-spark-1: #bd6453;
+  --theme-spark-2: #d58669;
+  --theme-spark-3: #e4a26b;
+  --shadow: 0 14px 38px rgba(124, 63, 45, .12);
+}
+
+html[data-space-theme="caramel"] {
+  --bg: #fbf2df;
+  --ink: #3e2b1e;
+  --muted: #71593e;
+  --surface-solid: #fffaf0;
+  --surface: #fffaef;
+  --line: #dfcaa7;
+  --theme-accent: #795020;
+  --theme-accent-end: #8c5c29;
+  --theme-soft: #f3e4ca;
+  --theme-hero: linear-gradient(124deg, #f7e8cc, #e6cc9f);
+  --theme-backdrop: radial-gradient(ellipse at 90% 4%, #eedcb9 0, transparent 48%), var(--bg);
+  --theme-radius: 14px;
+  --theme-blur: none;
+  --theme-spark-1: #a87841;
+  --theme-spark-2: #bb845b;
+  --theme-spark-3: #d2a367;
+  --shadow: 0 9px 24px rgba(92, 63, 30, .1);
+}
+
+html[data-space-theme="rose"] {
+  --bg: #fcecf0;
+  --ink: #442431;
+  --muted: #74515f;
+  --surface-solid: #fff8f9;
+  --surface: rgba(255, 248, 249, .9);
+  --line: #ebccd4;
+  --theme-accent: #943e53;
+  --theme-accent-end: #a7445c;
+  --theme-soft: #f8dce3;
+  --theme-hero: linear-gradient(124deg, #f9dce4, #eab4bf);
+  --theme-backdrop: radial-gradient(ellipse at 90% 4%, #edbcc9 0, transparent 47%), var(--bg);
+  --theme-radius: 20px;
+  --theme-blur: blur(10px);
+  --theme-spark-1: #b75a73;
+  --theme-spark-2: #d4778a;
+  --theme-spark-3: #e0a178;
+  --shadow: 0 16px 40px rgba(109, 43, 69, .14);
+}
+
+html[data-space-theme] {
+  /* Older components still consume the original shared color variable names. */
+  --lavender: var(--theme-spark-1);
+  --lavender-deep: var(--theme-accent);
+  --lavender-soft: var(--theme-soft);
+  --pink: var(--theme-spark-2);
+  --pink-soft: var(--theme-soft);
+  --theme-action: linear-gradient(125deg, var(--theme-accent), var(--theme-accent-end));
+}
+
+html[data-space-theme] :is(.app-shell, .app-loading, #auth-single-card, #auth-single-card .auth-workspace) {
+  background: var(--theme-backdrop) !important;
+  color: var(--ink);
+}
+
+/* Existing shell and sign-in styles set their surfaces with !important. */
+html[data-space-theme] .app-shell :is(
+  .sidebar, .mobile-nav, .topbar .message-button, .page-stage .panel,
+  .page-stage .glass-panel, .page-stage .quote-stage, .page-stage .memory-card,
+  .page-stage .items-list article, .page-stage .ann-list article,
+  .page-stage .timeline-summary, .page-stage .progress-panel, .page-stage .love-counter,
+  .calendar-main, .aside-section, .month-summary
+),
+html[data-space-theme] :is(
+  .account-panel, .notification-panel, .album-modal, .ann-editor, .item-editor, .cover-picker,
+  .shared-calendar .dialog, .future-panel, .future-composer, .voice-capsule-panel
+),
+html[data-space-theme] #auth-single-card .auth-workspace .auth-card {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+  border-radius: var(--theme-radius) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow) !important;
+  backdrop-filter: var(--theme-blur) !important;
+  -webkit-backdrop-filter: var(--theme-blur) !important;
+}
+
+html[data-space-theme] .app-shell .page-stage .hero-section:not(.has-cover) {
+  background: var(--theme-hero) !important;
+  border-radius: var(--theme-radius);
+}
+
+html[data-space-theme] .app-shell :is(
+  .nav-button.active, .mobile-nav-button.active, .primary-button,
+  .new-memory, .dark-action, .calendar-actions .add-button, .shared-calendar .button-primary
+),
+html[data-space-theme] :is(.account-panel .name-row > button, .account-panel .date-row > button),
+html[data-space-theme] #auth-single-card .auth-card .auth-submit {
+  background: var(--theme-action) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: var(--shadow) !important;
+}
+
+html[data-space-theme] .app-shell :is(.nav-button, .mobile-nav-button):not(.active),
+html[data-space-theme] .app-shell .page-stage :is(.eyebrow, .text-button, .icon-button, .topbar .message-button),
+html[data-space-theme] :is(.account-panel, .notification-panel) .eyebrow,
+html[data-space-theme] #auth-single-card :is(.eyebrow, .mode-switch, .login-type button.active) {
+  color: var(--theme-accent) !important;
+}
+
+html[data-space-theme] .app-shell .page-stage :is(
+  .topbar h1, .hero-section:not(.has-cover) .hero-copy h2,
+  .section-heading h2, .timeline-header h1, .album-header h1,
+  .list-header h1, .ann-header h1, .shared-calendar
+),
+html[data-space-theme] .account-panel > header h2,
+html[data-space-theme] #auth-single-card :is(.auth-heading h2, .invite-result h3) {
+  color: var(--ink) !important;
+}
+
+html[data-space-theme] .app-shell .love-duration .time-unit strong {
+  color: var(--theme-accent) !important;
+}
+
+html[data-space-theme] .app-shell .love-duration .time-unit span {
+  color: var(--muted) !important;
+}
+
+html[data-space-theme] .app-shell .avatar-left,
+html[data-space-theme] .account-panel .member-avatar {
+  background: var(--theme-accent);
+}
+
+html[data-space-theme] .app-shell .avatar-right {
+  background: var(--theme-accent-end);
+}
+
+html[data-space-theme] #auth-single-card :is(.auth-heading > span, .invite-result p, .invite-result small, .auth-form label > span) {
+  color: var(--muted) !important;
+}
+
+html[data-space-theme] #auth-single-card .auth-workspace .auth-card .auth-heading > p {
+  color: var(--theme-accent) !important;
+}
+
+html[data-space-theme] .app-shell .page-stage :is(
+  .story-entry-button, .quote-stage .soft-label, .view-switch button.active, .month-cell.selected
+),
+html[data-space-theme] #auth-single-card :is(.login-type, .code-box, .pairing-options button > span) {
+  background: var(--theme-soft) !important;
+  border-color: var(--line) !important;
+  color: var(--theme-accent) !important;
+}
+
+html[data-space-theme] #auth-single-card :is(.auth-form label > div, .pairing-options button) {
+  background: var(--surface-solid) !important;
+  border-color: var(--line) !important;
+}
+
+html[data-space-theme] #auth-single-card .auth-form label > div:focus-within {
+  border-color: var(--theme-accent) !important;
+  box-shadow: 0 0 0 3px var(--theme-soft) !important;
+}
+
+html[data-space-theme] :is(.app-shell, #auth-single-card, .account-panel) button:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 3px;
+}

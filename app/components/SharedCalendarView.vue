@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { BellRing, CalendarDays, ChevronLeft, ChevronRight, Check, CheckCircle2, Clock3, CloudSun, Edit3, Heart, LoaderCircle, MapPin, Plus, Repeat2, Sparkles, Trash2, X } from '@lucide/vue'
+import { BellRing, CalendarDays, ChevronLeft, ChevronRight, Check, CheckCircle2, Clock3, Edit3, Heart, LoaderCircle, MapPin, Plus, Repeat2, Trash2, X } from '@lucide/vue'
 import { EVENT_TYPES, type EventType, type RepeatRule, type SharedEvent, type SharedEventTask } from '~/composables/useSharedCalendar'
 
 type CalendarView = 'month' | 'week' | 'day'
 const { profile } = useCoupleAuth()
 const { events, tasks, loading, busy, error, load, createEvent, updateEvent, deleteEvent, addTask, toggleTask, deleteTask, startRealtime, stopRealtime, getEventsForMonth, getEventsForDate, getUpcomingEvents } = useSharedCalendar()
 const reminders = useSharedCalendarReminders()
-const { generate } = useHeartAi()
 const { createMemory } = useMemories()
 const view = ref<CalendarView>('month')
 const anchorDate = ref(new Date())
 const selectedDate = ref(dateKey(new Date()))
 const showEditor = ref(false)
-const showAi = ref(false)
 const editing = ref<SharedEvent | null>(null)
 const detailEvent = ref<SharedEvent | null>(null)
 const title = ref('')
@@ -26,15 +24,6 @@ const repeatUntil = ref('')
 const reminderMinutes = ref<number[]>([])
 const budget = ref('')
 const taskDraft = ref('')
-const city = ref('')
-const aiBudget = ref('9000 元')
-const preferences = ref('')
-const aiDate = ref(selectedDate.value)
-const aiStartTime = ref('10:00')
-const aiDuration = ref('一天')
-const aiResult = ref('')
-const aiError = ref('')
-const aiBusy = ref(false)
 const actionError = ref('')
 
 const today = dateKey(new Date())
@@ -165,39 +154,6 @@ async function finishAsMemory(event: SharedEvent) {
     if (detailEvent.value?.id === event.id) detailEvent.value = { ...detailEvent.value, status: 'done', memoryId: typeof memoryId === 'string' ? memoryId : '' }
   } catch (cause: any) { actionError.value = cause?.message || '保存回忆失败' }
 }
-async function recommendDate() {
-  if (!city.value.trim()) {
-    aiError.value = '请先填写城市，AI 才能检索真实地点'
-    return
-  }
-  if (!aiDate.value) {
-    aiError.value = '请选择出发日期'
-    return
-  }
-  aiBusy.value = true
-  aiError.value = ''
-  aiResult.value = ''
-  try {
-    aiResult.value = await generate('date_plan', {
-      city: city.value.trim(),
-      budget: aiBudget.value.trim() || '适中',
-      preferences: preferences.value.trim() || '轻松浪漫',
-      date: aiDate.value,
-      startTime: aiStartTime.value || '10:00',
-      time: aiDuration.value,
-    })
-  } catch (cause: any) { aiError.value = cause?.message || '暂时无法生成方案' }
-  finally { aiBusy.value = false }
-}
-function saveAiPlan() {
-  const plan = aiResult.value
-  showAi.value = false
-  openCreate(aiDate.value)
-  title.value = `${city.value || '我们的'}约会计划`
-  eventType.value = 'date'
-  budget.value = aiBudget.value.match(/\d+(?:\.\d+)?/)?.[0] || ''
-  description.value = plan
-}
 function eventTasks(event: SharedEvent): SharedEventTask[] { return tasks.value.filter(task => task.eventId === event.id) }
 
 onMounted(async () => {
@@ -220,7 +176,6 @@ onBeforeUnmount(stopRealtime)
         <button class="reminder-button" type="button" :disabled="reminders.busy" :aria-pressed="reminders.enabled" @click="reminders.enabled ? reminders.disable() : reminders.enable(reminderEvents)">
           <BellRing :size="16" />{{ reminders.enabled ? '提醒已开启' : '开启提醒' }}
         </button>
-        <button class="ai-button" type="button" @click="showAi = true"><Sparkles :size="16" />AI 约会推荐</button>
         <button class="add-button" type="button" @click="openCreate()"><Plus :size="17" />新建日程</button>
       </div>
     </header>
@@ -324,21 +279,6 @@ onBeforeUnmount(stopRealtime)
       </div>
     </Transition>
 
-    <Transition name="calendar-modal">
-      <div v-if="showAi" class="overlay" @click.self="showAi = false">
-        <section class="dialog ai-dialog" role="dialog" aria-modal="true" aria-labelledby="date-ai-title">
-          <header class="dialog-header"><div><p class="eyebrow">HEART AI</p><h2 id="date-ai-title"><Sparkles :size="20" />为你们安排一次约会</h2></div><button type="button" aria-label="关闭" @click="showAi = false"><X :size="19" /></button></header>
-          <div class="ai-form">
-            <div class="form-row"><label class="field-label">城市<input v-model="city" maxlength="40" placeholder="例如：上海" /></label><label class="field-label">预算<input v-model="aiBudget" maxlength="40" placeholder="例如：9000 元" /></label></div>
-            <div class="form-row"><label class="field-label">出发日期<input v-model="aiDate" type="date" /></label><label class="field-label">开始时间<input v-model="aiStartTime" type="time" /></label></div>
-            <label class="field-label">游玩时长<select v-model="aiDuration"><option>半天</option><option>一天</option><option>两天一夜</option></select></label>
-            <label class="field-label">偏好<input v-model="preferences" maxlength="200" placeholder="例如：安静、有展览、适合拍照" /></label>
-            <p class="ai-hint"><CloudSun :size="15" />会分别检索景点、餐饮活动和雨天备选，生成长方案。营业时间、价格、预约和天气请出发前确认。</p>
-            <button class="button-primary ai-generate" type="button" :disabled="aiBusy" @click="recommendDate"><LoaderCircle v-if="aiBusy" class="spin" :size="16" /><Sparkles v-else :size="16" />{{ aiBusy ? '正在搜索并规划' : '生成详细约会方案' }}</button><p v-if="aiError" class="form-error">{{ aiError }}</p><div v-if="aiResult" class="ai-result"><div>{{ aiResult }}</div><button class="button-primary" type="button" @click="saveAiPlan"><Plus :size="15" />加入日历</button></div>
-          </div>
-        </section>
-      </div>
-    </Transition>
   </section>
 </template>
 

@@ -308,7 +308,7 @@ function animatePageEnter(element: Element, done: () => void) {
     return
   }
   pageMotionContext = context(element, () => {
-    const introNodes = element.querySelectorAll('.topbar, .hero-section, .quote-stage, .timeline-header, .timeline-summary, .album-header, .album-filters, .style-panel')
+    const introNodes = element.querySelectorAll('.topbar, .hero-section, .quote-stage, .timeline-header, .timeline-summary, .album-header, .album-filters')
     if (introNodes.length) {
       gsap.fromTo(introNodes, { autoAlpha: 0, y: 18 }, {
         autoAlpha: 1,
@@ -320,7 +320,7 @@ function animatePageEnter(element: Element, done: () => void) {
       })
     }
 
-    const scrollNodes = element.querySelectorAll('.dashboard-grid > .panel, .timeline-entry, .photo-wall > button, .style-panel, .ann-list > article, .history > div > article')
+    const scrollNodes = element.querySelectorAll('.dashboard-grid > .panel, .timeline-entry, .photo-wall > button, .ann-list > article')
     if (!scrollNodes.length || !ScrollTrigger?.batch) return
     gsap.set(scrollNodes, { autoAlpha: 0, y: 18 })
     ScrollTrigger.batch(Array.from(scrollNodes), {
@@ -549,7 +549,6 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
 .nav-list { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 9px; width: 100%; }
 .nav-button { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; min-height: 54px; padding: 7px 4px; border: 0; border-radius: 20px; background: transparent; color: #a18aa8; cursor: pointer; transition: .2s ease; }
 .nav-button, .mobile-nav-button { position: relative; }
-.nav-unread { position:absolute;top:4px;right:5px;display:grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border:2px solid white;border-radius:9px;background:#cf5d88;color:white;font-size:7px;line-height:1; }
 .nav-button span { font-size: 10px; font-weight: 650; }
 .nav-button:hover { color: var(--lavender-deep); background: rgba(238, 233, 248, .55); }
 .nav-button.active { color: #6f369b; background: linear-gradient(145deg,#edd4ff,#ffdce9); box-shadow:0 10px 24px rgba(169,95,203,.16); }
@@ -558,7 +557,6 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
 .main-content { width: min(100%, 1180px); margin: 0 auto; }
 .topbar { display: flex; align-items: center; justify-content: space-between; min-height: 72px; margin-bottom: 22px; }
 .topbar-actions{display:flex;gap:8px}
-.message-toast{position:fixed;z-index:80;top:max(12px,env(safe-area-inset-top));left:50%;display:flex;align-items:center;gap:11px;width:min(calc(100% - 24px),390px);padding:12px 14px;border:1px solid rgba(255,255,255,.9);border-radius:19px;background:rgba(255,250,255,.97);color:#7f4b91;box-shadow:0 16px 42px rgba(78,43,91,.2);transform:translateX(-50%);text-align:left}.message-toast span{min-width:0;flex:1}.message-toast strong,.message-toast small{display:block}.message-toast strong{font-size:11px}.message-toast small{overflow:hidden;margin-top:3px;color:#735f78;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
 .eyebrow { margin: 0 0 7px; color: #a19aa9; font-size: 10px; font-weight: 750; letter-spacing: .12em; }
 .topbar h1 { margin: 0; font-size: clamp(24px, 2.3vw, 32px); font-weight: 760; letter-spacing: 0; color:#492a53; }
 .message-button, .icon-button { position: relative; display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border: 1px solid rgba(255,255,255,.85); border-radius: 16px; color: var(--lavender-deep); cursor: pointer; }
@@ -737,10 +735,10 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
 
 /* Quiet editorial layer: one accent color, clear surfaces, and photos before decoration. */
 .app-shell { background: #f7f5f8; }
-.app-shell :is(.timeline-header,.album-header,.list-header,.ann-header,.pet-house-header) { position:relative; }
-.app-shell :is(.timeline-header,.album-header,.list-header,.ann-header,.pet-house-header) > .page-back { flex:0 0 auto; }
-.app-shell :is(.timeline-header,.album-header,.list-header,.ann-header,.pet-house-header) > div:first-of-type { min-width:0; }
-.app-shell :is(.album-view,.list-view,.ann-view,.heart-ai,.pet-house-view) { position:relative; }
+.app-shell :is(.timeline-header, .album-header, .list-header, .ann-header) { position:relative; }
+.app-shell :is(.timeline-header, .album-header, .list-header, .ann-header) > .page-back { flex:0 0 auto; }
+.app-shell :is(.timeline-header, .album-header, .list-header, .ann-header) > div:first-of-type { min-width:0; }
+.app-shell :is(.album-view, .list-view, .ann-view) { position:relative; }
 .standalone-page-back { position:absolute;z-index:3;top:10px;left:0; }
 .app-shell::before { content: ''; position: fixed; z-index: -1; inset: 0; background: linear-gradient(115deg, rgba(234,224,241,.38), transparent 42%); pointer-events: none; }
 .glass-panel { border-color: rgba(80,63,89,.09); background: rgba(255,255,255,.86); box-shadow: 0 8px 24px rgba(48,37,54,.06); backdrop-filter: blur(12px) saturate(112%); -webkit-backdrop-filter: blur(12px) saturate(112%); }
@@ -795,24 +793,7 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
   background: linear-gradient(135deg, rgba(255,255,255,.36), transparent 42%, rgba(255,255,255,.2)) !important;
 }
 
-.app-shell :is(
-  .sidebar,
-  .mobile-nav,
-  .topbar .message-button,
-  .page-stage .panel,
-  .page-stage .glass-panel,
-  .page-stage .quote-stage,
-  .page-stage .pet-stats article,
-  .page-stage .style-panel,
-  .page-stage .heart-ai,
-  .page-stage .workspace,
-  .page-stage .history,
-  .page-stage .pet-scene,
-  .page-stage .status-panel,
-  .page-stage .network-card,
-  .page-stage .upload-card,
-  .page-stage .identity-card
-) {
+.app-shell :is(.sidebar, .mobile-nav, .topbar .message-button, .page-stage .panel, .page-stage .glass-panel, .page-stage .quote-stage, .page-stage .status-panel, .page-stage .network-card, .page-stage .upload-card, .page-stage .identity-card) {
   border-color: rgba(255, 255, 255, .72) !important;
   background: linear-gradient(145deg, rgba(255,255,255,.62), rgba(255,239,250,.38)) !important;
   box-shadow: 0 18px 44px rgba(88, 43, 105, .13), inset 0 1px 0 rgba(255,255,255,.86) !important;
@@ -820,76 +801,25 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
   -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
 }
 
-.app-shell :is(.page-stage .pet-scene) {
-  overflow: hidden;
-}
-
-.app-shell :is(.page-stage .hero-section, .page-stage .pet-scene) {
+.app-shell .page-stage .hero-section {
   isolation: isolate;
 }
 
-.app-shell :is(
-  .page-stage .hero-section,
-  .page-stage .heart-ai,
-  .page-stage .pet-house-view,
-  .page-stage .album-view,
-  .page-stage .timeline-view,
-  .page-stage .list-view,
-  .page-stage .ann-view
-) {
+.app-shell :is(.page-stage .hero-section, .page-stage .album-view, .page-stage .timeline-view, .page-stage .list-view, .page-stage .ann-view) {
   position: relative;
   z-index: 1;
-}
-
-.app-shell .page-stage :is(
-  .maker,
-  .result-body,
-  .history article,
-  .answers article,
-  .species-options button,
-  .skin-options button,
-  .accessory-options button
-) {
-  background: rgba(255,255,255,.48) !important;
-  border-color: rgba(255,255,255,.7) !important;
-  backdrop-filter: blur(14px) saturate(125%) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(125%) !important;
 }
 
 .app-shell .page-stage :is(.timeline-summary, .progress-panel, .love-counter) {
   background: linear-gradient(125deg, rgba(222,194,250,.62), rgba(255,205,228,.58), rgba(191,225,249,.5)) !important;
 }
 
-.app-shell.motion-reduced :is(
-  .love-piece,
-  .pet-big-avatar,
-  .pet-glow,
-  .pet-heart,
-  .reward-lamp,
-  .reward-moon-sofa
-) {
+.app-shell.motion-reduced .love-piece {
   animation: none !important;
 }
 
 @media (max-width: 650px) {
-  .app-shell :is(
-    .sidebar,
-    .mobile-nav,
-    .topbar .message-button,
-    .page-stage .panel,
-    .page-stage .glass-panel,
-    .page-stage .quote-stage,
-    .page-stage .pet-stats article,
-    .page-stage .style-panel,
-    .page-stage .heart-ai,
-    .page-stage .workspace,
-    .page-stage .history,
-    .page-stage .pet-scene,
-    .page-stage .status-panel,
-    .page-stage .network-card,
-    .page-stage .upload-card,
-    .page-stage .identity-card
-  ) {
+  .app-shell :is(.sidebar, .mobile-nav, .topbar .message-button, .page-stage .panel, .page-stage .glass-panel, .page-stage .quote-stage, .page-stage .status-panel, .page-stage .network-card, .page-stage .upload-card, .page-stage .identity-card) {
     background: linear-gradient(145deg, rgba(255,255,255,.68), rgba(255,240,249,.5)) !important;
     /* Mobile GPUs pay a large cost for full-screen backdrop filters. Keep the
        translucent surface, but let the background remain static and cheap. */
@@ -903,12 +833,7 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
 </style>
 
 
-<style>
-/* Chat is a fixed workspace: only the message list should scroll. */
-.chat-main{height:calc(100vh - 52px);min-height:0!important;overflow:hidden!important;padding-bottom:0!important}
-.chat-main .chat-host.is-page,.chat-main .chat-panel{height:100%;min-height:0!important}
-@media(max-width:650px){.chat-main{height:calc(100dvh - max(14px,env(safe-area-inset-top)) - 106px);min-height:0!important;padding-bottom:0!important;overflow:hidden!important}.chat-main .chat-host.is-page,.chat-main .chat-panel{height:100%!important;min-height:0!important}.chat-main .chat-host.is-page{width:100%}}
-</style>
+
 <style>
 .notification-trigger{position:relative}
 .notification-badge{position:absolute;right:-5px;top:-6px;min-width:19px;height:19px;padding:0 5px;display:grid;place-items:center;border:2px solid #fff;border-radius:99px;background:linear-gradient(135deg,#df609f,#8e4fc5);color:#fff;font-size:9px;line-height:1;box-shadow:0 5px 12px rgba(118,55,133,.24)}
@@ -916,13 +841,11 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
 .notification-panel{width:min(430px,calc(100vw - 36px));height:min(720px,calc(100dvh - 36px));display:flex;flex-direction:column;overflow:hidden;border-radius:28px!important;background:linear-gradient(145deg,rgba(255,252,255,.96),rgba(255,238,249,.91))!important;box-shadow:0 26px 80px rgba(65,31,78,.25)!important}
 .notification-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:23px 22px 17px;border-bottom:1px solid rgba(132,83,145,.12)}
 .notification-header h2{display:flex;align-items:center;gap:8px;margin:4px 0 0;color:#4d2b57;font-size:20px;letter-spacing:0}.notification-header h2 span{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#edc5de;color:#8d3d6e;font-size:11px}.notification-actions{display:flex;align-items:center;gap:6px}.notification-read-all{display:flex;align-items:center;gap:4px;padding:8px 9px;border:0;border-radius:10px;background:rgba(245,224,245,.72);color:#7e4b88;font-size:11px;cursor:pointer}.notification-header .icon-button{width:34px;height:34px;border-radius:11px!important;background:rgba(255,255,255,.62)!important;box-shadow:none!important}
-.notification-list{flex:1;overflow:auto;padding:10px 12px 18px}.notification-item{position:relative;display:flex;width:100%;gap:11px;padding:13px 10px;border:0;border-radius:16px;background:transparent;text-align:left;cursor:pointer;transition:background .2s ease}.notification-item:hover{background:rgba(255,255,255,.68)}.notification-item.unread{background:rgba(255,255,255,.55)}.notification-item+.notification-item{margin-top:3px}.notification-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:13px;color:#7b438b;background:linear-gradient(135deg,#f2dcfb,#ffddeb)}.notification-message{color:#a34480;background:linear-gradient(135deg,#ffe4f0,#ecdafb)}.notification-call{color:#587dae;background:linear-gradient(135deg,#dff1ff,#e8dcfa)}.notification-anniversary{color:#a26e39;background:linear-gradient(135deg,#fff0c9,#ffdce8)}.notification-streak{color:#c0693c;background:linear-gradient(135deg,#ffe7c5,#ffd9de)}.notification-pet{color:#6e9566;background:linear-gradient(135deg,#e5f6dd,#d8eef4)}.notification-ai{color:#7650a8;background:linear-gradient(135deg,#e9ddff,#ffdcef)}.notification-upload{color:#587e9c;background:linear-gradient(135deg,#dbefff,#e7e1ff)}.notification-copy{min-width:0;flex:1}.notification-title{display:flex;align-items:center;gap:7px}.notification-title strong{overflow:hidden;color:#4f3a55;font-size:13px;text-overflow:ellipsis;white-space:nowrap}.notification-title small{flex:0 0 auto;color:#a18a9e;font-size:9px}.notification-body{display:block;margin-top:5px;overflow:hidden;color:#786878;font-size:11px;line-height:1.55;text-overflow:ellipsis;white-space:nowrap}.notification-dot{align-self:center;flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#d65b9d;box-shadow:0 0 0 4px rgba(214,91,157,.11)}
+.notification-list{flex:1;overflow:auto;padding:10px 12px 18px}.notification-item{position:relative;display:flex;width:100%;gap:11px;padding:13px 10px;border:0;border-radius:16px;background:transparent;text-align:left;cursor:pointer;transition:background .2s ease}.notification-item:hover{background:rgba(255,255,255,.68)}.notification-item.unread{background:rgba(255,255,255,.55)}.notification-item+.notification-item{margin-top:3px}.notification-icon{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:13px;color:#7b438b;background:linear-gradient(135deg,#f2dcfb,#ffddeb)}.notification-anniversary{color:#a26e39;background:linear-gradient(135deg,#fff0c9,#ffdce8)}.notification-streak{color:#c0693c;background:linear-gradient(135deg,#ffe7c5,#ffd9de)}.notification-upload{color:#587e9c;background:linear-gradient(135deg,#dbefff,#e7e1ff)}.notification-copy{min-width:0;flex:1}.notification-title{display:flex;align-items:center;gap:7px}.notification-title strong{overflow:hidden;color:#4f3a55;font-size:13px;text-overflow:ellipsis;white-space:nowrap}.notification-title small{flex:0 0 auto;color:#a18a9e;font-size:9px}.notification-body{display:block;margin-top:5px;overflow:hidden;color:#786878;font-size:11px;line-height:1.55;text-overflow:ellipsis;white-space:nowrap}.notification-dot{align-self:center;flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#d65b9d;box-shadow:0 0 0 4px rgba(214,91,157,.11)}
 .notification-empty{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:30px;text-align:center;color:#a18a9e}.notification-empty svg:not(.spin){color:#d58bb2}.notification-empty strong{color:#65496c;font-size:15px}.notification-empty p{margin:0;font-size:11px}.spin{animation:notification-spin 1s linear infinite}@keyframes notification-spin{to{transform:rotate(360deg)}}
 @media(max-width:650px){.notification-overlay{align-items:flex-end;justify-content:center;padding:0 10px calc(78px + env(safe-area-inset-bottom));background:rgba(64,39,72,.16)}.notification-panel{width:100%;height:min(72dvh,620px);border-radius:25px 25px 18px 18px!important}.notification-header{padding:18px 17px 14px}.notification-list{padding-left:8px;padding-right:8px}.notification-title small{font-size:8px}.notification-body{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}}
 </style>
-<style>
-.live-status-capsule{position:fixed;z-index:80;top:20px;left:50%;display:flex;align-items:center;gap:9px;min-width:245px;max-width:min(360px,calc(100vw - 28px));padding:9px 10px;border:1px solid rgba(255,255,255,.84);border-radius:18px;background:linear-gradient(135deg,rgba(255,247,255,.9),rgba(250,226,247,.84));box-shadow:0 14px 35px rgba(81,44,93,.18);backdrop-filter:blur(18px) saturate(130%);transform:translateX(-50%)}.live-status-capsule.broadcasting{background:linear-gradient(135deg,rgba(236,218,255,.94),rgba(255,220,237,.9))}.live-status-icon{display:grid;place-items:center;width:29px;height:29px;border-radius:10px;background:rgba(255,255,255,.7);color:#a34e94}.live-status-copy{min-width:0;flex:1}.live-status-copy strong,.live-status-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.live-status-copy strong{color:#603769;font-size:11px}.live-status-copy small{margin-top:2px;color:#927b98;font-size:9px}.live-status-capsule>button{display:grid;place-items:center;width:28px;height:28px;border:0;border-radius:10px;background:rgba(255,255,255,.68);color:#7c4b88;cursor:pointer}.live-status-error{position:fixed;z-index:80;top:75px;left:50%;max-width:min(360px,calc(100vw - 28px));margin:0;transform:translateX(-50%);color:#b64f76;font-size:10px;text-align:center}.live-status-capsule~.live-status-error{margin-top:0}@media(max-width:650px){.live-status-capsule{top:max(10px,env(safe-area-inset-top));min-width:0;width:calc(100vw - 28px);border-radius:16px}.live-status-error{top:68px}}
-</style>
+
 
 <style>
 /* Romantic luxe layer: jewel-color light, layered glass, and photo-led depth. */
@@ -954,26 +877,7 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
     linear-gradient(135deg, rgba(239, 219, 250, .82), rgba(255, 237, 246, .74) 52%, rgba(219, 239, 250, .78)) !important;
 }
 
-.app-shell :is(
-  .sidebar,
-  .mobile-nav,
-  .topbar .message-button,
-  .page-stage .panel,
-  .page-stage .glass-panel,
-  .page-stage .quote-stage,
-  .page-stage .pet-stats article,
-  .page-stage .style-panel,
-  .page-stage .heart-ai,
-  .page-stage .workspace,
-  .page-stage .history,
-  .page-stage .pet-scene,
-  .page-stage .memory-card,
-  .page-stage .items-list article,
-  .page-stage .ann-list article,
-  .page-stage .timeline-summary,
-  .page-stage .progress-panel,
-  .page-stage .love-counter
-) {
+.app-shell :is(.sidebar, .mobile-nav, .topbar .message-button, .page-stage .panel, .page-stage .glass-panel, .page-stage .quote-stage, .page-stage .memory-card, .page-stage .items-list article, .page-stage .ann-list article, .page-stage .timeline-summary, .page-stage .progress-panel, .page-stage .love-counter) {
   border-color: rgba(255, 255, 255, .72) !important;
   background: linear-gradient(145deg, rgba(255,255,255,.62), rgba(255,239,250,.38)) !important;
   box-shadow: 0 18px 44px rgba(88, 43, 105, .13), inset 0 1px 0 rgba(255,255,255,.86) !important;
@@ -981,57 +885,16 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
   -webkit-backdrop-filter: blur(18px) saturate(130%) !important;
 }
 
-.app-shell :is(.page-stage .hero-section, .page-stage .pet-scene) {
+.app-shell .page-stage .hero-section {
   isolation: isolate;
 }
 
-.app-shell .page-stage :is(
-  .maker,
-  .result-body,
-  .history article,
-  .answers article,
-  .species-options button,
-  .skin-options button,
-  .accessory-options button
-) {
-  background: rgba(255,255,255,.48) !important;
-  border-color: rgba(255,255,255,.7) !important;
-  backdrop-filter: blur(12px) saturate(125%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(125%) !important;
-}
-
-.app-shell.motion-reduced :is(
-  .love-piece,
-  .pet-big-avatar,
-  .pet-glow,
-  .pet-heart,
-  .reward-lamp,
-  .reward-moon-sofa
-) {
+.app-shell.motion-reduced .love-piece {
   animation: none !important;
 }
 
 @media (max-width: 650px) {
-  .app-shell :is(
-    .sidebar,
-    .mobile-nav,
-    .topbar .message-button,
-    .page-stage .panel,
-    .page-stage .glass-panel,
-    .page-stage .quote-stage,
-    .page-stage .pet-stats article,
-    .page-stage .style-panel,
-    .page-stage .heart-ai,
-    .page-stage .workspace,
-    .page-stage .history,
-    .page-stage .pet-scene,
-    .page-stage .memory-card,
-    .page-stage .items-list article,
-    .page-stage .ann-list article,
-    .page-stage .timeline-summary,
-    .page-stage .progress-panel,
-    .page-stage .love-counter
-  ) {
+  .app-shell :is(.sidebar, .mobile-nav, .topbar .message-button, .page-stage .panel, .page-stage .glass-panel, .page-stage .quote-stage, .page-stage .memory-card, .page-stage .items-list article, .page-stage .ann-list article, .page-stage .timeline-summary, .page-stage .progress-panel, .page-stage .love-counter) {
     background: linear-gradient(145deg, rgba(255,255,255,.68), rgba(255,240,249,.5)) !important;
     backdrop-filter: blur(10px) saturate(125%) !important;
     -webkit-backdrop-filter: blur(10px) saturate(125%) !important;
@@ -1040,22 +903,6 @@ button:focus-visible { outline: 3px solid rgba(168, 139, 216, 0.35); outline-off
 
 .app-shell .page-stage .hero-section:not(.has-cover) {
   background: linear-gradient(128deg, rgba(215,180,251,.68), rgba(246,179,211,.58) 48%, rgba(169,213,246,.52)) !important;
-}
-
-.app-shell .page-stage .pet-scene {
-  background: linear-gradient(145deg, rgba(216,185,239,.72), rgba(246,206,222,.58) 54%, rgba(196,217,243,.52)) !important;
-}
-
-.app-shell .page-stage .pet-scene.scene-pink {
-  background: linear-gradient(145deg, rgba(247,191,211,.72), rgba(245,212,225,.58) 54%, rgba(216,200,240,.52)) !important;
-}
-
-.app-shell .page-stage .pet-scene.scene-mint {
-  background: linear-gradient(145deg, rgba(185,230,217,.72), rgba(225,240,223,.58) 54%, rgba(200,216,238,.52)) !important;
-}
-
-.app-shell .page-stage .pet-scene.scene-night {
-  background: linear-gradient(145deg, rgba(102,114,184,.78), rgba(139,116,187,.66) 54%, rgba(52,59,117,.68)) !important;
 }
 </style>
 

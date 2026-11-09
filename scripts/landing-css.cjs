@@ -117,9 +117,7 @@ section{padding:100px 0}.alt{background:var(--bg2);transition:background .3s}
 .dl-meta{display:block;font-size:11px;color:var(--t3);margin-bottom:14px}
 .dl-note{margin-top:12px;font-size:11px;color:var(--t3);line-height:1.6}
 .dl-note a{color:var(--bl);font-weight:500}
-.qr-box{display:grid;place-items:center;width:108px;height:108px;margin:14px auto 2px;padding:8px;border-radius:12px;background:#fff;border:1px solid var(--bd)}
-.qr-box svg{width:100%;height:100%;color:#1d1d1f}
-.qr-cap{display:block;font-size:10.5px;color:var(--t3);margin-top:8px}
+[data-apk-download][hidden]{display:none}
 .cmp-note{text-align:center;margin-top:16px;font-size:12px;color:var(--t3)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
 .stat .num{font-size:clamp(36px,4vw,56px);font-weight:900;letter-spacing:-.03em}

@@ -6,19 +6,13 @@
 
 <p align="center">
   一个真正属于两个人的私密生活空间。<br>
-  把照片、视频、悄悄话、纪念日、AI 灵感和共同宠物，认真收藏在一起。
+  把共同回忆、纪念日、每日打卡和写给对方的信收藏在一起。
 </p>
 
 <p align="center">
   <a href="https://github.com/XTH-LOVE/Love-"><img src="https://img.shields.io/github/stars/XTH-LOVE/Love-?style=for-the-badge&color=ff6fae&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/XTH-LOVE/Love-/network/members"><img src="https://img.shields.io/github/forks/XTH-LOVE/Love-?style=for-the-badge&color=9c6ade&label=Forks" alt="GitHub forks"></a>
   <a href="https://github.com/XTH-LOVE/Love-/blob/HEAD/LICENSE"><img src="https://img.shields.io/github/license/XTH-LOVE/Love-?style=for-the-badge&color=7eb8e8" alt="MIT license"></a>
-  <a href="https://love-home.pages.dev/"><img src="https://img.shields.io/badge/Live%20Demo-love--home.pages.dev-f4a1c5?style=for-the-badge" alt="Live demo"></a>
-</p>
-
-<p align="center">
-  <a href="https://xthxiazai.oss-cn-beijing.aliyuncs.com/Love%E5%B0%8F%E5%AE%B6-latest.zip"><img src="https://img.shields.io/badge/Android-下载%20APK-3ddc84?style=for-the-badge" alt="Download APK"></a>
-  <a href="https://xthxiazai.oss-cn-beijing.aliyuncs.com/Love%E5%B0%8F%E5%AE%B6-Windows-x64.exe"><img src="https://img.shields.io/badge/Windows-下载%20EXE-0078d6?style=for-the-badge" alt="Download EXE"></a>
 </p>
 
 <p align="center">
@@ -33,35 +27,21 @@
   <img src="public/login-couple.jpg" width="820" alt="Love小家登录页预览">
 </p>
 
-## 下载安装
+## 安装
 
-| 平台 | 下载方式 | 说明 |
-| --- | --- | --- |
-| Web 网页版 | [打开在线体验](https://love-home.pages.dev/) | 无需安装，支持 PWA 添加到主屏幕 |
-| Android | [下载 APK](https://xthxiazai.oss-cn-beijing.aliyuncs.com/Love%E5%B0%8F%E5%AE%B6-latest.zip) | 下载后把 `.zip` 后缀改为 `.apk` 即可安装（阿里云政策禁止默认域名直连分发 APK） |
-| Windows | [下载 EXE](https://xthxiazai.oss-cn-beijing.aliyuncs.com/Love%E5%B0%8F%E5%AE%B6-Windows-x64.exe) | 142 MB 安装包，下载后双击安装 |
-| 官网 | [官方宣传页](https://love-home.pages.dev/official/) | 产品介绍与下载入口，APK 由 Pages 代理分发 |
-
-国内用户可直接从阿里云 OSS（北京节点）下载，无需访问 GitHub。
+本分支用于自托管。网页和 Android 可按下方流程在本地构建。安装与更新使用本项目自行构建的产物。
 
 ## 为什么做 Love小家
 
-很多情侣应用只提供一个聊天框，或者把纪念日、相册和日记拆散在不同产品里。Love小家想做的是一个更完整、更有温度的双人空间：
-
-- 不是公开社交网络，而是只属于同一情侣空间成员的私密房间。
-- 不是一次性发完就消失的聊天，而是可以回看的共同记忆库。
-- 不是冷冰冰的工具集合，而是有开屏、品牌、情绪化视觉和共同宠物的长期陪伴产品。
-- 不是只停留在网页的 Demo，而是同时面向 Web、Android 和 Windows 桌面端设计。
-
-Love小家使用淡紫、淡粉、白色和玻璃质感作为视觉基调，把“记录日常”做成一种轻松、浪漫、愿意每天打开的习惯。
+两位成员可以在各自的设备上记录共同回忆、维护共享计划，或写一封留到未来才打开的信。可以在设置中选择暖色主题。
 
 ## English overview
 
-**Love小家 (CoupleSpace)** is a private, realtime space for two people. It combines shared memories, albums, private messages, anniversaries, AI-assisted writing, location sharing, realtime calls and a growing virtual pet system in one calm, romantic interface.
+**Love小家 (CoupleSpace)** is a private, realtime space for two people. It combines shared memories, albums, anniversaries, a calendar, daily check-ins, handwritten letters and voice capsules in one calm, romantic interface.
 
 It is built with Nuxt 4, Vue 3, TypeScript and Supabase, and can be shipped as a static web app, an Android application through Capacitor, or a Windows desktop app through Electron. The repository is intentionally self-hostable: authentication, database policies, storage, realtime channels and server-side secrets are documented so developers can build their own private couple space instead of relying on a public social network.
 
-The project is still evolving. Contributions are welcome, especially around accessibility, offline media, better pet interactions, testing and platform polish.
+The project is still evolving. Contributions are welcome, especially around accessibility, offline media, testing and platform polish.
 
 ## 功能一览
 
@@ -71,7 +51,7 @@ The project is still evolving. Contributions are welcome, especially around acce
 - 支持选择共同封面，并根据照片比例自动适配展示区域。
 - 最近共同回忆最多展示 10 项，支持照片和视频预览。
 - 今日情话轮播、共同计划、下一个纪念日和情书入口集中在首页。
-- 首页展示悄悄话未读角标和系统通知入口。
+- 首页展示共同动态和系统通知入口。
 - 支持开屏动画、一次性软件声明、版本更新提示和关于软件页面。
 
 ### 时光轴：把故事写下来
@@ -90,19 +70,6 @@ The project is still evolving. Contributions are welcome, especially around acce
 - 每项媒体显示拍摄日期和添加者。
 - 使用签名地址、浏览器缓存和分批加载，避免每次打开都重新等待全部媒体。
 
-### 悄悄话：双人实时消息
-
-- 文字消息、照片、短视频、语音和表情表达。
-- 消息按时间展示，并显示发送状态、已读状态和发送者头像。
-- 打开聊天后自动标记已读，自动滚动到最新消息。
-- Enter 快速发送，手机端使用全屏聊天布局。
-- 支持撤回自己发送的消息和媒体。
-- 支持发送当前位置、共享实时位置、真实地图查看、放大缩小和全屏地图。
-- 支持语音通话、视频通话以及无需接听即可收听的开麦模式。
-- 支持系统级通知、来电提示和网络重连。
-
-> 通话、系统通知、实时位置和地图需要浏览器/系统权限以及对应的 Supabase、ZEGO 或地图服务配置。未配置外部服务时，核心页面仍可启动并用于本地演示。
-
 ### 纪念日：重要日子不再错过
 
 - 设置在一起的日期，并实时计算共同经历的时间。
@@ -115,28 +82,17 @@ The project is still evolving. Contributions are welcome, especially around acce
 - 任意一方完成后，另一方可以实时看到状态变化。
 - 首页显示待完成事项和完成进度。
 
-### 心动 AI：让 AI 帮你写得更像你们
+### 每日打卡与互动
 
-- AI 约会策划：根据城市、预算和偏好生成约会方案。
-- AI 日记：根据当天真实素材生成可保存的共同日记。
-- AI 情书：选择收件人、字数和语气，生成后保存为长期作品。
-- 生成结果可以展开全文，切换页面后仍可从历史记录中打开。
-- 使用 Supabase Edge Function 代理 DeepSeek 请求，API Key 只保存在服务端 Secret。
-- 约会策划会检索网页地点线索；搜索不可用或资料不足时会退回通用活动建议，并提示出发前核实。
-- 服务端包含请求长度限制、频率限制和错误提示，避免把 AI 生成变成不可控的黑盒。
-
-### 宠物小屋：一起养一只属于你们的宠物
-
-- 支持不同宠物种类、皮肤、配饰和 3D Fox 模型。
-- 宠物拥有喂养、互动、成长和进化机制。
-- 共同互动可以积累续火花天数。
-- 支持宠物小屋、家具扩展和专属动作的持续开发。
+- 两位成员每天各打卡一次，双方完成后计入连续记录。可查看历史日历、最高连续天数和保护卡。
+- 记录每日心情、回答每日问答，或在共享日历里安排下一次见面。
+- 保留手写情书、未来邮箱、声音胶囊、共同故事和秘密彩蛋。
 
 ## 视觉与交互
 
 - 桌面端：浮动玻璃侧边栏，适合宽屏持续使用。
 - 手机端：浮动底部导航，避开状态栏和系统导航区域。
-- 大圆角、半透明表面、淡紫淡粉渐变和柔和阴影。
+- 大圆角、半透明表面、三套可切换的暖色主题和柔和阴影。
 - 使用 Manrope 与 Nunito Sans，兼顾英文产品信息和中文界面阅读。
 - 使用 Lucide 图标，按钮保留清晰的图标、状态和无障碍标签。
 - 上传、加载、失败重试、空状态和移动端安全区均有独立处理。
@@ -148,15 +104,11 @@ The project is still evolving. Contributions are welcome, especially around acce
 | Web 应用 | Nuxt 4、Vue 3、TypeScript | SSR、静态生成和组件化界面 |
 | 样式与交互 | CSS、玻璃质感设计、Lucide | 响应式布局、主题和图标系统 |
 | 用户与数据 | Supabase Auth、Postgres、RLS | 登录、情侣空间、数据隔离和权限控制 |
-| 实时能力 | Supabase Realtime | 消息、情书、宠物和共同数据同步 |
+| 实时能力 | Supabase Realtime | 打卡、在线状态和共同数据同步 |
 | 私密媒体 | Supabase Storage | 照片、视频、语音和短期签名地址 |
-| 服务端能力 | Supabase Edge Functions | AI 请求代理、ZEGO Token、敏感逻辑隔离 |
-| AI | DeepSeek Flash | 约会策划、共同日记和情书生成 |
-| 通话 | ZEGO Express | 音频通话、视频通话和开麦模式 |
-| 地图 | Leaflet / 高德地图配置 | 位置消息、实时位置和地图展示 |
-| 3D | Three.js、GLB 模型 | 宠物模型、动作和进化展示 |
+| 服务端能力 | Supabase Edge Functions | 账户登录、恢复与安全管理 |
 | 移动端 | Capacitor Android | Android APK 构建和系统能力接入 |
-| 桌面端 | Electron | Windows 桌面软件和自动加载线上版本 |
+| 桌面端 | Electron | 加载指定部署的 Windows 桌面壳 |
 
 ## 项目结构
 
@@ -164,19 +116,18 @@ The project is still evolving. Contributions are welcome, especially around acce
 CoupleSpace/
 ├─ app/
 │  ├─ app.vue                 # 应用壳、导航、首页和全局状态
-│  ├─ components/             # 首页、相册、时光、聊天、AI、宠物等界面
-│  ├─ composables/            # Auth、Realtime、媒体缓存、通话和业务逻辑
+│  ├─ components/             # 首页、相册、时光、日历和打卡界面
+│  ├─ composables/            # Auth、Realtime、媒体缓存和业务逻辑
 │  └─ plugins/supabase.ts     # Supabase 客户端初始化
 ├─ public/
 │  ├─ couplespace-mark.svg    # 品牌图标
-│  ├─ login-couple.jpg        # 登录页视觉资源
-│  └─ models/Fox.glb          # 3D 宠物模型
+│  └─ login-couple.jpg        # 登录页视觉资源
 ├─ supabase/
-│  ├─ migrations/             # 数据表、RLS、Realtime 和宠物系统迁移
-│  └─ functions/              # AI、ZEGO Token、账户相关 Edge Functions
+│  ├─ bootstrap/              # 从新空库初始化的迁移链
+│  ├─ migrations/             # 原版迁移历史
+│  └─ functions/              # 账户相关 Edge Functions
 ├─ android/                   # Capacitor Android 工程
 ├─ desktop/                   # Electron Windows 桌面壳
-├─ infra/                     # 可选通话基础设施配置
 ├─ capacitor.config.json
 ├─ nuxt.config.ts
 └─ package.json
@@ -186,17 +137,9 @@ CoupleSpace/
 
 ### 1. 克隆项目
 
-```bash
-git clone https://github.com/XTH-LOVE/Love-.git
-cd Love-
-npm install
-```
-
-Windows PowerShell：
+打开本分支所在的仓库目录，安装依赖并复制配置模板。
 
 ```powershell
-git clone https://github.com/XTH-LOVE/Love-.git
-Set-Location Love-
 npm install
 Copy-Item .env.example .env
 ```
@@ -210,56 +153,19 @@ NUXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NUXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-可选能力：
-
-- `NUXT_PUBLIC_AMAP_KEY`：高德地图 Web 端 Key。
-- `NUXT_PUBLIC_AMAP_SECURITY_CODE`：高德安全密钥。
-- `NUXT_PUBLIC_ZEGO_APP_ID`：ZEGO App ID。
-- `NUXT_PUBLIC_ZEGO_SERVER`：ZEGO WebSocket 服务地址。
+原生端如需更新检查，将 `NUXT_PUBLIC_UPDATE_MANIFEST_URL` 设为自己的部署地址。
 
 ### 3. 初始化 Supabase
 
-将 `supabase/migrations/` 中的迁移应用到自己的 Supabase 项目。使用 Supabase CLI 时可以：
+新空库按 [迁移说明](supabase/bootstrap/README.md) 使用 `supabase/bootstrap/` 的版本链。先在独立的本地实例验证。根目录 `supabase/migrations/` 对应旧部署的历史，和新链分开使用。
 
-```bash
-npx supabase login
-npx supabase link --project-ref your-project-ref
-npx supabase db push
-```
-
-再部署 Edge Functions：
-
-```bash
-npx supabase functions deploy account-auth
-npx supabase functions deploy heart-ai
-npx supabase functions deploy zego-token
-```
-
-Edge Function Secrets 应在 Supabase 控制台配置：
-
-- `AI_PROVIDER=deepseek`（默认值）
-- `DEEPSEEK_API_KEY`（必填，只配置在 Supabase Secrets）
-- `DEEPSEEK_BASE_URL`（可选，默认 `https://api.deepseek.com/v1`）
-- `DEEPSEEK_MODEL`（可选，默认 `deepseek-flash`）
-- `ZEGO_SERVER_SECRET`
-
-这些值只应该存在于服务端 Secrets 中，不要写进 `.env`、README、前端代码或提交记录。
-如果仍需临时切回旧 MiMo 服务，可设置 `AI_PROVIDER=mimo`，并配置 `MIMO_API_KEY`；`MIMO_BASE_URL` 和 `MIMO_MODEL` 可选。
-
-也可以使用 Supabase CLI 配置并部署：
-
-```bash
-npx supabase secrets set AI_PROVIDER=deepseek DEEPSEEK_API_KEY=你的密钥 DEEPSEEK_MODEL=deepseek-flash
-npx supabase functions deploy heart-ai
-```
+账户注册、恢复和注销依赖 `account-auth` 与 `account-security`。测试环境可以使用本地预置账号。启用注册前先按部署计划落实双账号准入。真实服务密钥只配置在服务端。
 
 ### 4. 启动开发环境
 
 ```bash
-npm run dev
+npm run dev -- --host 127.0.0.1 --port 3200
 ```
-
-默认开发地址通常是 `http://127.0.0.1:3200/`。如果 3200 端口已被占用，Nuxt 会选择其他端口。
 
 ## 构建与发布
 
@@ -286,7 +192,7 @@ npm run desktop:dev
 npm run desktop:exe
 ```
 
-Electron 桌面壳默认加载线上 Web 版本，因此网页业务更新不一定需要重新制作 EXE。安装包输出到 `desktop-dist/`。
+Electron 默认加载本地 `http://127.0.0.1:3200/`。若使用自己的部署，在启动进程中设置 `LOVE_HOME_DESKTOP_URL` 和对应的 `NUXT_PUBLIC_SUPABASE_URL`。安装包输出到 `desktop-dist/`。
 
 ### 版本更新
 
@@ -294,13 +200,12 @@ Electron 桌面壳默认加载线上 Web 版本，因此网页业务更新不一
 
 ## 安全与隐私设计
 
-Love小家处理的是情侣之间的照片、视频、消息和位置，因此安全边界不是附加功能，而是核心设计：
+情侣空间通过账号和成员关系保护照片、视频、录音和共同记录。
 
 - 每个用户属于一个情侣空间，业务查询以 `couple_id` 为边界。
 - Supabase Postgres 使用 RLS 限制同一情侣空间之外的访问。
 - 私密媒体使用 Storage 签名地址，不把公开永久文件 URL 作为主要访问方式。
-- 前端只使用 Supabase anon key；service role key、ZEGO ServerSecret、AI Key 只允许放在服务端。
-- AI 请求通过 Edge Function 转发，避免在浏览器暴露供应商密钥。
+- 前端只使用 Supabase anon key；service role key 只允许放在服务端。
 - 账户设置中不会显示用户密码，只提供修改或重置能力。
 - 生产环境必须使用 HTTPS，并按实际部署域名配置认证回调地址。
 
@@ -310,18 +215,11 @@ Love小家处理的是情侣之间的照片、视频、消息和位置，因此�
 | --- | --- | --- |
 | Web 登录与情侣空间 | ✅ 可用 | 需要配置 Supabase Auth 和数据库 |
 | 首页、相册、时光、纪念日、清单 | ✅ 可用 | 支持真实数据和演示模式 |
-| 双人实时文字与媒体消息 | ✅ 可用 | 需要消息表、Storage 和 Realtime |
-| AI 约会、日记、情书 | ✅ 可用 | 需要部署 `heart-ai` 并配置 DeepSeek Secrets |
-| 真实地图与位置分享 | 🧪 配置后可用 | 需要地图 Key、域名白名单和定位权限 |
-| 音频/视频通话 | 🧪 配置后可用 | 需要 ZEGO ServerSecret、浏览器媒体权限 |
-| 3D 宠物与成长系统 | 🚧 持续完善 | 当前已接入模型、皮肤、配饰和互动基础 |
-| Android / Windows 发布 | ✅ 可构建 | 正式发布需要各平台签名和商店配置 |
+| 双人打卡与历史 | ✅ 已通过本地双账号验证 | 需要空库迁移链 |
+| Android / Windows 构建 | 提供构建入口 | 本地构建需要对应工具链，分发需要签名 |
 
 ## 路线图
 
-- [ ] 更丰富的 3D 宠物模型、家具和动作系统。
-- [ ] 共同宠物的成长阶段、任务和奖励。
-- [ ] 更完整的系统级来电、通知和后台音频体验。
 - [ ] 媒体上传断点续传、离线队列和更智能的本地缓存。
 - [x] PWA 安装清单、Service Worker 离线应用壳和安装提示。
 - [ ] 桌面通知和跨设备同步优化。
@@ -350,10 +248,6 @@ Love小家处理的是情侣之间的照片、视频、消息和位置，因此�
 
 检查 `.env` 中的 Supabase URL 和 anon key，确认当前部署环境也配置了相同变量，并重新生成或重新部署静态文件。
 
-### 为什么通话提示 Token 无效？
-
-ZEGO 的前端 App ID 不能替代 ServerSecret。请在 Supabase Edge Function Secrets 中配置真实 `ZEGO_SERVER_SECRET`，并确认 Edge Function 返回的 App ID 与前端一致。
-
 ### 为什么照片加载失败或很慢？
 
 确认 Storage bucket、RLS、签名地址和部署域名配置正确。项目会使用签名地址、图片变换、浏览器 Cache Storage 和分批加载，但首次访问大视频仍然受网络和文件大小影响。
@@ -377,6 +271,5 @@ ZEGO 的前端 App ID 不能替代 ServerSecret。请在 Supabase Edge Function 
 
 <p align="center">
   <strong>愿每一段认真相爱的日常，都有一个值得回来的地方。</strong><br>
-  <a href="https://github.com/XTH-LOVE/Love-">访问 GitHub 项目</a> ·
-  <a href="https://love-home.pages.dev/">打开在线体验</a>
+  <a href="https://github.com/XTH-LOVE/Love-">访问上游 GitHub 项目</a>
 </p>

@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Love小家 · CoupleSpace — 把日子，写成一本书</title>
-<meta name="description" content="Love小家是一个只属于两个人的私密 App：相册、悄悄话、纪念日、AI 情书和共同宠物，都收在一间小家里。开源 MIT，可自托管。">
-<link rel="canonical" href="https://love-home.pages.dev/official/">
+<meta name="description" content="Love小家是一个只属于两个人的私密 App：相册、纪念日、手写情书和双人打卡，都收在一间小家里。开源 MIT，可自托管。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Nunito+Sans:wght@400;700;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
@@ -20,6 +19,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Manrope','Nunito Sans','Microsoft YaHei','PingFang SC',sans-serif; background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased; overflow-x:hidden}
+[data-apk-download][hidden],[data-web-app][hidden]{display:none}
 .hand{font-family:'Ma Shan Zheng','STKaiti','KaiTi',serif; font-weight:400}
 ::selection{background:#F8CEDF}
 a{color:inherit}
@@ -199,7 +199,7 @@ pre.code .c{color:#A99DAE}
       <a href="#opensource">开源</a>
       <a href="#faq">常见问题</a>
     </nav>
-    <a class="btn btn-ink btn-sm" href="https://love-home.pages.dev/" target="_blank" rel="noopener">在线体验</a>
+    <a class="btn btn-ink btn-sm" href="/" data-web-app hidden>在线体验</a>
   </div>
 </header>
 
@@ -210,13 +210,13 @@ pre.code .c{color:#A99DAE}
     <div>
       <p class="overline">情侣私密空间 · 开源 MIT · 可自托管</p>
       <h1>把日子，<br><span class="u">写成一本书。</span><span class="note">只属于两个人</span></h1>
-      <p class="sub">Love小家是一个<b>只属于两个人的私密 App</b>：相册、悄悄话、纪念日、AI 情书和共同宠物，都收在一间小家里。不用在五个应用之间来回翻，打开一处，全都在。</p>
+      <p class="sub">Love小家是一个<b>只属于两个人的私密 App</b>：相册、纪念日、手写情书和双人打卡，都收在一间小家里。不用在五个应用之间来回翻，打开一处，全都在。</p>
       <div class="cta">
-        <a class="btn btn-ink" href="https://love-home.pages.dev/" target="_blank" rel="noopener">在线体验 →</a>
-        <a class="btn btn-violet" href="/downloads/Love小家-latest.apk" download>下载 Android APK ↓</a>
+        <a class="btn btn-ink" href="/" data-web-app hidden>在线体验 →</a>
+        <a class="btn btn-violet" href="/downloads/Love小家-latest.apk" data-apk-download hidden download>下载 Android APK ↓</a>
         <a class="btn btn-line" href="https://github.com/XTH-LOVE/Love" target="_blank" rel="noopener">去 GitHub 看看 ★ 22</a>
       </div>
-      <p class="meta">Web / Android / Windows 三端 · Android 当前版本 v1.0.1 · 数据放在你自己的 Supabase 里 · <b>本页演示开箱即动，不用点任何东西</b></p>
+      <p class="meta">Web / Android / Windows 三端 · 数据放在你自己的 Supabase 里 · <b>本页演示开箱即动，不用点任何东西</b></p>
     </div>
     <div class="polaroids" aria-hidden="true">
       <figure class="pol"><i></i><div class="ph" style="background:#E8D4F5"></div><figcaption>海边日落</figcaption></figure>
@@ -316,7 +316,7 @@ pre.code .c{color:#A99DAE}
         <label><input type="checkbox" checked> 周末去一次海边</label>
         <label><input type="checkbox" checked> 把上次旅行的照片整理进相册</label>
         <label><input type="checkbox" checked> 写一封今年的纪念日情书</label>
-        <label><input type="checkbox"> 给宠物小屋添一件家具</label>
+        <label><input type="checkbox"> 计划下一次周末散步</label>
         <label><input type="checkbox"> 定下一次旅行的城市</label>
       </div>
       <p class="hint">演示已勾选 3 / 5 项；你也可以自己勾着玩，进度环会跟着动。</p>
@@ -337,10 +337,10 @@ pre.code .c{color:#A99DAE}
     <div class="ch"><div class="n">03</div><h3>时光轴<span>故事按日期排好</span></h3><div class="ch-desc"><p>每条回忆都带着<b>文字、地点、照片和视频</b>，随时编辑、删除和回看。第一次旅行、生日、见面、纪念日，和普通但值得记住的一天，都按时间排好。</p><p class="tags"><b>能力</b> · 按日期记录 · 地点 · 编辑回看</p></div></div>
     <div class="ch"><div class="n">04</div><h3>纪念日<span>重要日子不再错过</span></h3><div class="ch-desc"><p>设好在一起的日子，时间会自己算；<b>可重复的纪念日、旅行日、生日和自定义日期</b>，下一个特别的日子还有几天，一抬头就知道。</p><p class="tags"><b>能力</b> · 在一起计时 · 重复提醒 · 剩余天数</p></div></div>
     <div class="ch"><div class="n">05</div><h3>清单<span>一起完成的小事</span></h3><div class="ch-desc"><p>共同计划、备注、分类、优先级和计划日期；<b>任意一方完成，另一方实时看到状态变化</b>，首页显示待完成事项和完成进度。</p><p class="tags"><b>能力</b> · 共同计划 · 实时同步 · 进度汇总</p></div></div>
-    <div class="ch"><div class="n">06</div><h3>悄悄话<span>只说给一个人听</span></h3><div class="ch-desc"><p>不是公开社交网络，也不是发完就消失的聊天：<b>文字、照片、短视频、语音和表情</b>，发送状态、已读状态、撤回、自动标已读都在，手机端是全屏聊天布局。</p><p class="tags"><b>能力</b> · 实时消息 · 已读撤回 · 语音图片视频</p></div></div>
-    <div class="ch"><div class="n">07</div><h3>通话与位置<span>聊不够就打过来</span></h3><div class="ch-desc"><p><b>语音通话、视频通话、无需接听的开麦模式</b>，外加发送当前位置、共享实时位置、真实地图查看；系统级通知、来电提示和网络重连都备好了。</p><p class="tags"><b>能力</b> · ZEGO Express · 开麦 · 实时位置 · 地图</p></div></div>
-    <div class="ch"><div class="n">08</div><h3>心动 AI<span>写得像你们，不像模板</span></h3><div class="ch-desc"><p><b>AI 约会策划、AI 日记、AI 情书</b>：按城市、预算和偏好出方案，按当天真实素材写日记，选收件人、字数和语气生成情书，生成完保存为长期作品。请求走服务端代理，密钥不放进前端。</p><p class="tags"><b>能力</b> · 小米 MiMo · Edge Function 代理 · 限流与错误提示</p></div></div>
-    <div class="ch"><div class="n">09</div><h3>宠物小屋<span>一起养一只，它会长大</span></h3><div class="ch-desc"><p>不同种类、皮肤和配饰，<b>3D Fox 模型，喂养、互动、成长、进化</b>样样都有；两个人一起互动，还能攒续火花天数，小屋、家具和专属动作也在一直长大。</p><p class="tags"><b>能力</b> · 3D 模型 · 成长进化 · 续火花 · 家具扩展</p></div></div>
+    <div class="ch"><div class="n">06</div><h3>每日打卡<span>每天留一个共同记录</span></h3><div class="ch-desc"><p>各自打卡，双方都完成后当天计入连续记录。可以按月查看历史，并了解保护卡的使用情况。</p><p class="tags"><b>能力</b> · 双人实时同步 · 日历 · 连续天数</p></div></div>
+    <div class="ch"><div class="n">07</div><h3>共享日历<span>把两个人的安排放在一起</span></h3><div class="ch-desc"><p>添加约会、旅行和提醒等共同安排。可按日历和日程列表浏览，给每项安排添加待办事项。</p><p class="tags"><b>能力</b> · 共享日程 · 事项清单 · 提醒</p></div></div>
+    <div class="ch"><div class="n">08</div><h3>手写情书<span>写给另一半的话</span></h3><div class="ch-desc"><p>在首页写下想说的话，也可以把信放进未来邮箱，等约好的日期再打开。</p><p class="tags"><b>能力</b> · 手写情书 · 未来邮箱</p></div></div>
+    <div class="ch"><div class="n">09</div><h3>声音胶囊<span>把声音留在这里</span></h3><div class="ch-desc"><p>录下今天想分享的声音，保存为胶囊。对方可以在你们的空间里回听。</p><p class="tags"><b>能力</b> · 录制 · 回听 · 共同收藏</p></div></div>
   </div>
 </section>
 
@@ -349,15 +349,15 @@ pre.code .c{color:#A99DAE}
   <div class="sec-head">
     <span class="no">门锁</span>
     <h2>这间屋子，只住两个人</h2>
-    <p>Love小家处理的是情侣之间的照片、视频、消息和位置，所以安全边界不是附加功能，而是核心设计。</p>
+    <p>Love小家保存两个人的照片、视频、回忆和信件，访问权限以情侣空间为边界。</p>
   </div>
   <div class="safel">
-    <div class="safe"><b>情侣空间隔离</b><p>每个用户只属于一个情侣空间，业务查询以 couple_id 为边界；Supabase Postgres 用 RLS 限制空间之外的访问，22 张数据表全部覆盖。</p></div>
+    <div class="safe"><b>情侣空间隔离</b><p>每个用户只属于一个情侣空间，业务查询以 couple_id 为边界；Supabase Postgres 用 RLS 限制其他账户读取情侣私密数据。</p></div>
     <div class="safe"><b>私密媒体签名地址</b><p>照片、视频、语音走 Storage 签名地址，不把公开永久文件 URL 作为主要访问方式；浏览器缓存与分批加载只为减少等待，不为绕开权限。</p></div>
-    <div class="safe"><b>密钥不出前端</b><p>前端只用 Supabase anon key；service role key、ZEGO ServerSecret、AI Key 只允许放在服务端，浏览器里找不到它们。</p></div>
-    <div class="safe"><b>服务端代理与限流</b><p>AI 请求、ZEGO Token、账户操作全部走 Supabase Edge Functions；AI 侧有请求长度限制、频率限制与错误提示，不把生成变成不可控的黑盒。</p></div>
+    <div class="safe"><b>密钥不出前端</b><p>前端只使用 Supabase 的公开连接配置，服务端密钥留在服务端。</p></div>
+    <div class="safe"><b>服务端代理与限流</b><p>账户认证和安全操作经 Supabase Edge Functions 处理。</p></div>
   </div>
-  <p class="stackline"><b>技术栈</b> · Nuxt 4 · Vue 3 · TypeScript · Supabase · Postgres + RLS · Realtime · ZEGO Express · 小米 MiMo · Leaflet / 高德 · Three.js · Capacitor · Electron</p>
+  <p class="stackline"><b>技术栈</b> · Nuxt 4 · Vue 3 · TypeScript · Supabase · Postgres + RLS · Realtime · Capacitor · Electron</p>
 </section>
 
 <!-- 三端 -->
@@ -373,14 +373,14 @@ pre.code .c{color:#A99DAE}
       <b>Web 网页端</b>
       <p>静态生成，部署在 Cloudflare Pages 上。打开链接就是小家，桌面端浮动玻璃侧边栏，手机端浮动底部导航，处处避开刘海与手势区。</p>
       <div class="price">免费体验<small> · 在线直接用</small></div>
-      <a class="btn btn-ink" href="https://love-home.pages.dev/" target="_blank" rel="noopener">打开 love-home.pages.dev</a>
+      <a class="btn btn-ink" href="/" data-web-app hidden>打开网页版</a>
     </div>
     <div class="plan">
       <span class="flag">CAPACITOR</span>
       <b>Android</b>
-      <p>当前发布 v1.0.1。优化了移动端首屏启动和心情签到反馈；签到先即时显示，再在后台完成同步。通过官网获取签名一致的最新版 APK。</p>
-      <div class="price">免费下载安装<small> · v1.0.1 · Android</small></div>
-      <a class="btn btn-violet" href="/downloads/Love小家-latest.apk" download>下载 APK ↓</a>
+      <p>可在 Windows 构建 APK。此站部署已配置 Android 发布包时，下方显示下载入口。</p>
+      <div class="price">本地构建<small> · npm run android:apk</small></div>
+      <a class="btn btn-violet" href="/downloads/Love小家-latest.apk" data-apk-download hidden download>下载 APK ↓</a>
     </div>
     <div class="plan">
       <span class="flag">ELECTRON</span>
@@ -400,8 +400,8 @@ pre.code .c{color:#A99DAE}
     <p>仓库有意做成可自托管：认证、数据库策略、存储、实时通道与服务端密钥都有文档。数据放在你自己的 Supabase 里。</p>
   </div>
   <div class="steps">
-    <div class="step"><div class="n">01</div><b>拿下仓库</b><p>Clone 之后就是完整工程：应用壳、首页、相册、时光、聊天、AI、宠物界面与全部迁移文件。</p></div>
-    <div class="step"><div class="n">02</div><b>配好服务端</b><p>按文档配置 Supabase Auth、RLS、Storage 与 6 个 Edge Functions；ZEGO、地图、MiMo 按需接入。</p></div>
+    <div class="step"><div class="n">01</div><b>拿下仓库</b><p>Clone 之后就是完整工程：应用壳、首页、相册、时光轴、双人打卡与数据库迁移。</p></div>
+    <div class="step"><div class="n">02</div><b>配好服务端</b><p>按文档配置 Supabase Auth、RLS、Storage 和账户 Edge Functions。</p></div>
     <div class="step"><div class="n">03</div><b>生成并部署</b><p>静态生成结果可部署到 Cloudflare Pages、Netlify、Vercel 或任意静态托管。</p></div>
   </div>
   <pre class="code"><span class="c"># Web 静态站点</span>
@@ -423,12 +423,9 @@ npm run desktop:exe</pre>
     <p>点开看答案，不点也能往下翻。</p>
   </div>
   <div class="faq">
-    <details><summary>不配置 ZEGO、地图这些外部服务，能用吗？</summary><p>能。通话、系统通知、实时位置和地图需要浏览器或系统权限以及对应的 Supabase、ZEGO 或地图服务配置；未配置外部服务时，核心页面仍可启动并用于本地演示。</p></details>
-    <details><summary>我的照片和聊天会被公开吗？</summary><p>不会。每个用户只属于一个情侣空间，业务查询以 couple_id 为边界，Postgres RLS 限制空间之外的访问；媒体走 Storage 签名地址，不用公开永久文件 URL。</p></details>
-    <details><summary>一定要部署自己的后端吗？</summary><p>不一定。可以直接用在线演示 <a href="https://love-home.pages.dev/" target="_blank" rel="noopener">love-home.pages.dev</a>；想把数据完全放在自己手里，再按仓库文档自托管一套。</p></details>
-    <details><summary>AI 功能用的是什么模型？密钥安全吗？</summary><p>小米 MiMo，约会策划、共同日记与情书生成。请求经 Supabase Edge Function 代理，API Key 不放进前端；服务端有请求长度限制与频率限制。</p></details>
-    <details><summary>收费吗？</summary><p>项目本身 MIT 开源。自托管只涉及你自己的服务资源（Supabase、ZEGO、地图等按需接入的服务），没有来自项目本身的订阅费。</p></details>
-    <details><summary>通话失败报 1102016 是什么意思？</summary><p>ZEGO Token 无效或已过期的一种：Edge Function 使用的 AppID 与网页配置不一致。请确认两边 AppID 相同，并重新部署 Token Function。</p></details>
+    <details><summary>我的照片和回忆会被公开吗？</summary><p>不会。每个用户只属于一个情侣空间，业务查询以 couple_id 为边界，Postgres RLS 限制空间之外的访问；媒体走 Storage 签名地址，不用公开永久文件 URL。</p></details>
+    <details><summary>一定要部署自己的后端吗？</summary><p>可以先使用本页演示。要保存双方数据，请按仓库文档设置自己的 Supabase 项目和应用。</p></details>
+    <details><summary>收费吗？</summary><p>项目本身 MIT 开源。自托管只涉及你自己的服务资源（例如 Supabase），没有来自项目本身的订阅费。</p></details>
   </div>
 </section>
 </main>
@@ -438,12 +435,12 @@ npm run desktop:exe</pre>
     <div class="foot-grid">
       <div>
         <b>Love小家 · CoupleSpace</b>
-        <p>一个真正属于两个人的私密生活空间。把照片、视频、悄悄话、纪念日、AI 灵感和共同宠物，认真收藏在一起。</p>
+        <p>一个真正属于两个人的私密生活空间。把照片、视频、纪念日、手写情书和双人打卡，认真收藏在一起。</p>
         <p class="hand" style="font-size:26px; color:var(--rose); margin-top:14px">愿你们的小家，一直亮着灯。</p>
       </div>
       <div class="foot-links">
-        <a href="https://love-home.pages.dev/" target="_blank" rel="noopener">在线体验</a>
-        <a href="/downloads/Love小家-latest.apk" download>下载 Android APK</a>
+        <a href="/" data-web-app hidden>在线体验</a>
+        <a href="/downloads/Love小家-latest.apk" data-apk-download hidden download>下载 Android APK</a>
         <a href="https://github.com/XTH-LOVE/Love" target="_blank" rel="noopener">GitHub 仓库</a>
         <a href="#day">小家的一天</a>
         <a href="#inside">里面有什么</a>
@@ -451,12 +448,30 @@ npm run desktop:exe</pre>
       </div>
     </div>
     <p class="foot-note">Love小家 · CoupleSpace · Nuxt 4 + Vue 3 + TypeScript + Supabase · MIT 开源<br>
-    演示台与小家的一天均为页内演示，日期与清单只存在你的浏览器里，不会上传；功能描述与数据（9 章、22 表 RLS、6 个 Edge Functions、GitHub ★22 / Fork 10）来自仓库实查（2026-11-01）。<br>
-    <a href="https://github.com/XTH-LOVE/Love" target="_blank" rel="noopener">github.com/XTH-LOVE/Love</a> · <a href="https://love-home.pages.dev/official/" target="_blank" rel="noopener">官方宣传页</a> · <a href="https://love-home.pages.dev/" target="_blank" rel="noopener">love-home.pages.dev</a></p>
+    演示台与小家的一天均为页内演示，日期与清单只存在你的浏览器里，不会上传；功能描述以仓库当前实现为准。<br>
+    <a href="https://github.com/XTH-LOVE/Love" target="_blank" rel="noopener">github.com/XTH-LOVE/Love</a></p>
   </div>
 </footer>
 
 <script>
+const webLinks = document.querySelectorAll('[data-web-app]');
+if (window.location.pathname === '/') {
+  fetch('/app-update.json').then(response => response.json()).then(manifest => {
+    if (manifest.webUrl && new URL(manifest.webUrl).protocol === 'https:') {
+      webLinks.forEach(link => { link.href = manifest.webUrl; link.hidden = false; });
+    }
+  }).catch(() => {});
+} else {
+  webLinks.forEach(link => { link.hidden = false; });
+}
+const apkLinks = document.querySelectorAll('[data-apk-download]');
+if (apkLinks.length) fetch(apkLinks[0].href, { method: 'HEAD' }).then(response => {
+  const contentType = response.headers.get('content-type')?.split(';')[0];
+  if (response.ok && ['application/vnd.android.package-archive', 'application/octet-stream'].includes(contentType)) {
+    apkLinks.forEach(link => { link.hidden = false; });
+  }
+}).catch(() => {});
+
 /* 本地日期（不用 UTC，避免跨时区差一天） */
 function localISO(d){
   const p = n => String(n).padStart(2, '0');
@@ -473,8 +488,8 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 const scenes = [
   { time: '08:00', part: '早上', title: '早安，先看一眼小家', hand: '首页', desc: '睁眼先看首页：<b>在一起的天数在走字</b>，今日情话已经换了一句，下一个纪念日还有几天，一抬头就知道。', tag: '首页总控台 · 今日情话' },
   { time: '12:30', part: '中午', title: '午饭随手存进相册', hand: '相册', desc: '午饭照片不用翻聊天记录找：<b>多选上传，上传前先在手机端压好</b>，标着拍摄日期和是谁放进来的。', tag: '相册 · 多选上传' },
-  { time: '20:00', part: '晚上', title: '下班路上先聊起来', hand: '悄悄话', desc: '<b>文字、照片、语音随手发</b>，晚上不用接听就能开麦，一边做饭一边聊，撤回和已读都在。', tag: '悄悄话 · 开麦模式' },
-  { time: '23:00', part: '深夜', title: '睡前喂一次狐狸', hand: '宠物小屋', desc: '<b>3D 小狐狸喂一喂、摸一摸</b>，续火花又多一天；小屋和家具也在跟着你们一起长大。', tag: '宠物小屋 · 续火花' }
+  { time: '20:00', part: '晚上', title: '把周末安排加进日历', hand: '共享日历', desc: '把时间和要带的东西写下来，两个人随时都能查看安排。', tag: '共享日历 · 共同安排' },
+  { time: '23:00', part: '深夜', title: '睡前完成双人打卡', hand: '每日打卡', desc: '你们各自打卡后，这一天会记在共同的打卡日历里。', tag: '每日打卡 · 连续记录' }
 ];
 let dayIdx = 0, dayTimer = null;
 const dayBtns = document.querySelectorAll('#dayProgress button');

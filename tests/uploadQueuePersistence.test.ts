@@ -39,4 +39,19 @@ describe('upload queue persistence', () => {
       error: '浏览器未能恢复文件内容，请重新选择文件',
     })
   })
+
+  it('does not restore pending uploads from retired chat', () => {
+    expect(restorePersistedJobs(JSON.stringify([
+      { id: 'chat', operation: { kind: 'message' } },
+      { id: 'album', operation: { kind: 'album' } },
+      { id: 'voice', name: '声音胶囊 · 一段录音', operation: { kind: 'message', mediaType: 'audio' } },
+    ]))).toEqual([
+      expect.objectContaining({ id: 'album' }),
+      expect.objectContaining({ id: 'voice', operation: { kind: 'voice-capsule', mediaType: 'audio' } }),
+    ])
+    expect(restoredJobPatch({ id: 'file', meta: { jobId: 'chat', operation: { kind: 'message' } } })).toBeNull()
+    expect(restoredJobPatch({ id: 'voice-file', meta: {
+      jobId: 'voice', displayName: '声音胶囊 · 一段录音', operation: { kind: 'message', mediaType: 'audio' },
+    } })).toMatchObject({ operation: { kind: 'voice-capsule', mediaType: 'audio' } })
+  })
 })

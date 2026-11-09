@@ -4,26 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Love小家 · CoupleSpace — 只属于两个人的私密空间</title>
-<meta name="description" content="一个真正属于两个人的私密生活空间。把照片、悄悄话、纪念日、AI灵感和共同宠物收藏在一起。开源、免费、跨平台。">
+<meta name="description" content="两个人的私密生活空间。把相册、纪念日、手写情书和双人打卡收藏在一起。开源，可自托管。">
 <meta name="theme-color" content="#ffffff">
-<link rel="canonical" href="https://love-landing-8s9.pages.dev/">
 <link rel="icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/desktop-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Love小家 · CoupleSpace — 只属于两个人的私密空间">
-<meta property="og:description" content="把照片、悄悄话、纪念日、AI灵感和共同宠物收藏在一起。开源、免费、跨平台。">
-<meta property="og:url" content="https://love-landing-8s9.pages.dev/">
-<meta property="og:image" content="https://love-landing-8s9.pages.dev/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:description" content="把相册、纪念日、手写情书和双人打卡收藏在一起。开源，可自托管。">
 <meta property="og:site_name" content="Love小家">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Love小家 · CoupleSpace">
 <meta name="twitter:description" content="只属于两个人的私密生活空间。开源、免费、跨平台。">
-<meta name="twitter:image" content="https://love-landing-8s9.pages.dev/og-image.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Love小家","description":"只属于两个人的私密生活空间","applicationCategory":"LifestyleApplication","operatingSystem":"Web, Android, Windows","softwareVersion":"1.0.0","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"},"license":"https://opensource.org/licenses/MIT"}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"怎么安装 Android APK？","acceptedAnswer":{"@type":"Answer","text":"点击页面“下载 APK”或用手机扫码下载。首次安装时如系统提示“禁止安装未知来源应用”，进入设置允许本次安装，然后点击下载好的文件即可完成安装。"}},{"@type":"Question","name":"Windows 提示“Windows 已保护你的电脑”怎么办？","acceptedAnswer":{"@type":"Answer","text":"这是 SmartScreen 对未签名应用的常规提示。点击“更多信息”后选择“仍要运行”即可继续安装，安装程序只会写入你选择的目录。"}},{"@type":"Question","name":"登录后为什么还是演示模式？","acceptedAnswer":{"@type":"Answer","text":"检查 .env 中的 Supabase URL 和 anon key，确认部署环境也配置了相同变量，并重新生成静态文件。"}},{"@type":"Question","name":"通话提示 Token 无效怎么办？","acceptedAnswer":{"@type":"Answer","text":"ZEGO 的前端 App ID 不能替代 ServerSecret。请在 Supabase Edge Function Secrets 中配置真实密钥。"}},{"@type":"Question","name":"能不能只用网页，不构建 APK？","acceptedAnswer":{"@type":"Answer","text":"当然可以。运行 npm run generate 后部署 .output/public/ 到静态托管即可。"}},{"@type":"Question","name":"数据存储在哪里？是否安全？","acceptedAnswer":{"@type":"Answer","text":"所有数据存储在你自己配置的 Supabase 项目中，使用 RLS 行级安全策略隔离，可完全自托管。"}},{"@type":"Question","name":"如何贡献代码或提出建议？","acceptedAnswer":{"@type":"Answer","text":"欢迎在 GitHub 提交 Issue 或 Pull Request。Fork 仓库，创建功能分支，保持修改范围清晰即可。"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"怎么安装 Android APK？","acceptedAnswer":{"@type":"Answer","text":"有已发布的安装包时，点下载链接取得 APK。也可以用仓库的 Android 构建命令生成。首次安装时按 Android 提示允许本次安装。"}},{"@type":"Question","name":"Windows 提示“Windows 已保护你的电脑”怎么办？","acceptedAnswer":{"@type":"Answer","text":"这是 SmartScreen 对未签名应用的常规提示。点击“更多信息”后选择“仍要运行”即可继续安装，安装程序只会写入你选择的目录。"}},{"@type":"Question","name":"登录后为什么还是演示模式？","acceptedAnswer":{"@type":"Answer","text":"检查 .env 中的 Supabase URL 和 anon key，确认部署环境也配置了相同变量，并重新生成静态文件。"}},{"@type":"Question","name":"能不能只用网页，不构建 APK？","acceptedAnswer":{"@type":"Answer","text":"当然可以。运行 npm run generate 后部署 .output/public/ 到静态托管即可。"}},{"@type":"Question","name":"数据存储在哪里？是否安全？","acceptedAnswer":{"@type":"Answer","text":"所有数据存储在你自己配置的 Supabase 项目中，使用 RLS 行级安全策略隔离，可完全自托管。"}},{"@type":"Question","name":"如何贡献代码或提出建议？","acceptedAnswer":{"@type":"Answer","text":"欢迎在 GitHub 提交 Issue 或 Pull Request。Fork 仓库，创建功能分支，保持修改范围清晰即可。"}}]}</script>
 <script>
 // Apply theme before first paint: saved preference > system preference
 try{var _t=localStorage.getItem('theme');if(!_t)_t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';document.documentElement.setAttribute('data-theme',_t)}catch(e){}
@@ -146,9 +140,7 @@ section{padding:100px 0}.alt{background:var(--bg2);transition:background .3s}
 .dl-meta{display:block;font-size:11px;color:var(--t3);margin-bottom:14px}
 .dl-note{margin-top:12px;font-size:11px;color:var(--t3);line-height:1.6}
 .dl-note a{color:var(--bl);font-weight:500}
-.qr-box{display:grid;place-items:center;width:108px;height:108px;margin:14px auto 2px;padding:8px;border-radius:12px;background:#fff;border:1px solid var(--bd)}
-.qr-box svg{width:100%;height:100%;color:#1d1d1f}
-.qr-cap{display:block;font-size:10.5px;color:var(--t3);margin-top:8px}
+[data-apk-download][hidden]{display:none}
 .cmp-note{text-align:center;margin-top:16px;font-size:12px;color:var(--t3)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
 .stat .num{font-size:clamp(36px,4vw,56px);font-weight:900;letter-spacing:-.03em}
@@ -302,7 +294,7 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <a href="#faq" data-sec="faq">FAQ</a>
 <a href="https://github.com/XTH-LOVE/Love-" target="_blank" rel="noopener">GitHub</a>
 <button class="theme-toggle" id="themeToggle" aria-label="切换深浅主题"><svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg><svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
-<a href="https://love-home.pages.dev/" target="_blank" rel="noopener" class="nb">开始使用</a>
+<a href="/" class="nb">开始使用</a>
 </div>
 <button class="mb" id="mb" aria-label="菜单" aria-expanded="false" aria-controls="dr"><span></span></button>
 </div></nav>
@@ -311,14 +303,14 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <div class="dl">
 <a href="#features">功能</a><a href="#compare">对比</a><a href="#showcase">亮点</a><a href="#how">上手</a><a href="#download">下载</a><a href="#changelog">更新日志</a><a href="#faq">FAQ</a>
 <a href="https://github.com/XTH-LOVE/Love-" target="_blank" rel="noopener">GitHub</a>
-<a href="https://love-home.pages.dev/" target="_blank" rel="noopener" class="dcta">开始使用 →</a>
+<a href="/" class="dcta">开始使用 →</a>
 </div></div></div>
 <section class="hero" id="hero"><div class="W">
 <div class="rv"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.1);font-size:11px;font-weight:700;color:var(--v);letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px"><span style="width:6px;height:6px;border-radius:50%;background:var(--gn);box-shadow:0 0 8px var(--gn);animation:pls 2s ease-in-out infinite"></span> 开源 · 跨平台 · 实时同步</span></div>
 <h1 class="rv d1">只属于你们俩的<br><span class="gt">私密生活空间</span></h1>
-<p class="sub rv d2">把照片、视频、悄悄话、纪念日、AI 灵感和共同宠物，<br>认真收藏在一起。不是公开社交网络，而是只属于你们的房间。</p>
+<p class="sub rv d2">把照片、视频、纪念日、手写情书和双人打卡，<br>认真收藏在只属于你们的空间。</p>
 <div class="hact rv d3">
-<a href="https://love-home.pages.dev/" target="_blank" rel="noopener" class="b1">打开在线体验 →</a>
+<a href="/" class="b1">打开在线体验 →</a>
 <a href="https://github.com/XTH-LOVE/Love-" target="_blank" rel="noopener" class="b2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12Z"/></svg>GitHub</a>
 </div>
 <div class="phone-wrap rv d4">
@@ -331,18 +323,18 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <div class="pcard"><div class="lb">最近回忆</div><div class="pgrid"><i style="background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(236,72,152,.08))"></i><i style="background:linear-gradient(135deg,rgba(0,113,227,.12),rgba(52,199,89,.08))"></i><i style="background:linear-gradient(135deg,rgba(255,159,10,.12),rgba(236,72,152,.08))"></i><i style="background:linear-gradient(135deg,rgba(52,199,89,.12),rgba(124,58,237,.08))"></i></div></div>
 <div class="pcard" style="background:rgba(255,255,255,.5)"><div class="lb">下一个纪念日</div><div class="sb" style="color:var(--v);font-weight:700;margin-top:2px">相识 600 天 · 还有 80 天</div></div>
 </div>
-<div class="pnav"><div class="pnv-i on"><span>🏠</span>首页</div><div class="pnv-i"><span>📷</span>相册</div><div class="pnv-i"><span>💬</span>悄悄话</div><div class="pnv-i"><span>🐾</span>宠物</div></div>
+<div class="pnav"><div class="pnv-i on"><span>🏠</span>首页</div><div class="pnv-i"><span>📷</span>相册</div><div class="pnv-i"><span>📖</span>时光</div><div class="pnv-i"><span>📅</span>日历</div></div>
 </div></div>
 <div class="fl a"><span class="fi pk">💌</span>收到一封情书</div>
-<div class="fl b"><span class="fi pp">🐾</span>宠物升级了!</div>
-<div class="fl c"><span class="fi bl">📍</span>分享位置给你</div>
+<div class="fl b"><span class="fi pp">🔥</span>今日双人打卡完成</div>
+<div class="fl c"><span class="fi bl">📅</span>共同日历有新安排</div>
 </div>
 </div>
 <div class="scroll-hint"><span>向下滚动</span><div class="arrow"></div></div>
 </section>
 <section id="story"><div class="W">
 <div class="story-box rv">
-<div class="story-quote">“照片不该被淹没在群聊里，<br>纪念日不该只靠日历提醒，悄悄话也不必混进社交动态。”</div>
+<div class="story-quote">“把喜欢的照片放在一起，<br>把重要的日子写进共同的日历。”</div>
 <p class="story-text">Love小家始于一个朴素的愿望：想要一个只属于两个人的安静角落。于是我们自己动手造了这个房间——把重要的日常认真收藏在一起。后来我们决定把它开源，希望每一对认真相爱的人，都能拥有一个值得回来的地方。</p>
 <div class="story-sign"><span class="story-name">缐廷华</span> · Love小家开发者 · <a href="https://github.com/XTH-LOVE" target="_blank" rel="noopener">GitHub: XTH-LOVE</a></div>
 </div></div></section>
@@ -355,10 +347,10 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <tr><td>私密数据隔离</td><td>✖</td><td>○</td><td class="hl">✔</td></tr>
 <tr><td>开源免费</td><td>✖</td><td>✖</td><td class="hl">✔</td></tr>
 <tr><td>自托管部署</td><td>✖</td><td>✖</td><td class="hl">✔</td></tr>
-<tr><td>AI 情书/日记</td><td>✖</td><td>○</td><td class="hl">✔</td></tr>
-<tr><td>3D 宠物养成</td><td>✖</td><td>✖</td><td class="hl">✔</td></tr>
+
+
 <tr><td>跨平台一致体验</td><td>○</td><td>○</td><td class="hl">✔</td></tr>
-<tr><td>音视频通话</td><td>✔</td><td>✖</td><td class="hl">✔</td></tr>
+
 </tbody>
 </table>
 <div class="cmp-note rv d2">✔ 完全支持 · ○ 部分支持 · ✖ 不支持（对比基于此类产品的普遍情况概括）</div>
@@ -369,30 +361,30 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <div class="card span2 rv d1"><div class="ci" style="background:rgba(236,72,152,.06);border:1px solid rgba(236,72,152,.1)">🏠</div><h3>共同首页</h3><p>实时在一起的天数、共同封面、最近回忆预览、今日情话和纪念日倒计时。</p></div>
 <div class="card span2 rv d2"><div class="ci" style="background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.1)">📖</div><h3>时光轴</h3><p>按日期记录文字、地点、照片和视频，写下值得记住的每一天。</p></div>
 <div class="card rv d3"><div class="ci" style="background:rgba(0,113,227,.06);border:1px solid rgba(0,113,227,.1)">📷</div><h3>相册管理</h3><p>多相册管理照片和视频，支持压缩上传和签名地址安全访问。</p></div>
-<div class="card rv d4"><div class="ci" style="background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.1)">💬</div><h3>悄悄话</h3><p>双人实时消息，支持文字、照片、视频、语音和位置分享。</p></div>
+<div class="card rv d4"><div class="ci" style="background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.1)">🎙️</div><h3>声音胶囊</h3><p>录下一段想让对方听见的声音，保存在共同空间里。</p></div>
 <div class="card rv d5"><div class="ci" style="background:rgba(255,159,10,.06);border:1px solid rgba(255,159,10,.1)">📅</div><h3>纪念日</h3><p>设置重要日期，创建可重复的纪念日，实时计算共同经历的时间。</p></div>
 <div class="card rv d6"><div class="ci" style="background:rgba(236,72,152,.06);border:1px solid rgba(236,72,152,.1)">✅</div><h3>共同清单</h3><p>创建共同计划和优先级，一方完成后另一方实时看到状态变化。</p></div>
-<div class="card span2 rv d3"><div class="ci" style="background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.1)">🤖</div><h3>心动 AI</h3><p>MiMo 驱动的 AI 约会策划、共同日记和情书生成，让 AI 帮你写得更像你们。</p></div>
-<div class="card span2 rv d4"><div class="ci" style="background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.1)">🐾</div><h3>宠物小屋</h3><p>一起养一只 3D 宠物，支持喂养、互动、成长进化和续火花天数。</p></div>
+<div class="card span2 rv d3"><div class="ci" style="background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.1)">💌</div><h3>手写情书</h3><p>写下想对另一半说的话，也可以用未来邮箱定时送达。</p></div>
+<div class="card span2 rv d4"><div class="ci" style="background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.1)">🔥</div><h3>双人打卡</h3><p>各自完成每日打卡，一起查看连续天数、打卡日历和保护卡。</p></div>
 </div></div></section>
 <section class="alt" id="stats"><div class="W"><div class="stats">
-<div class="stat rv d1"><div class="num gt" data-target="12">0</div><div class="label">核心功能模块</div></div>
+<div class="stat rv d1"><div class="num gt" data-target="8">0</div><div class="label">精选功能</div></div>
 <div class="stat rv d2"><div class="num gt" data-target="3">0</div><div class="label">平台全覆盖</div></div>
 <div class="stat rv d3"><div class="num gt2" data-target="100">0</div><div class="label">% 开源免费</div></div>
 <div class="stat rv d4"><div class="num gt2" data-target="24">0</div><div class="label">/7 实时同步</div></div>
 </div></div></section>
 <section id="showcase"><div class="W"><div class="show-grid">
 <div class="show-visual rv"><div class="show-inner">
-<div class="sr"><div class="sva a"></div><div class="svb">今天的晚霞好美，想和你一起看 ♡</div></div>
-<div class="sr sf"><div class="svb sf">下次我们一起去海边看日落吧!</div><div class="sva b"></div></div>
-<div class="sr"><div class="sva a"></div><div class="svb">好呀! 我把它加到清单里了 ✨</div></div>
-<div class="sr sf"><div class="svb sf">🐾 宠物狐狸刚刚升级了!</div><div class="sva b"></div></div>
+<div class="sr"><div class="sva a"></div><div class="svb">时光轴 · 记下今天的晚霞</div></div>
+<div class="sr sf"><div class="svb sf">共享日历 · 周末去海边看日落</div><div class="sva b"></div></div>
+<div class="sr"><div class="sva a"></div><div class="svb">共同清单 · 带上相机</div></div>
+<div class="sr sf"><div class="svb sf">每日打卡 · 今天两个人都已完成</div><div class="sva b"></div></div>
 </div></div>
 <div>
 <div class="sh rv" style="text-align:left;margin-bottom:28px"><span class="tag">✦ 产品亮点</span><h2 style="font-size:clamp(28px,3.5vw,44px)">不只是工具，<br>是<span class="gt">有温度的陪伴</span></h2></div>
 <div class="check-list">
-<div class="check-item rv d1"><span class="check-icon">✓</span><span>淡紫淡粉渐变、玻璃质感和柔和阴影，每一处细节都经过精心设计</span></div>
-<div class="check-item rv d2"><span class="check-icon">✓</span><span>实时同步消息、位置和宠物状态，两个人始终连接在一起</span></div>
+<div class="check-item rv d1"><span class="check-icon">✓</span><span>可切换杏桃晨光、焦糖手记和玫瑰晚霞三套暖色主题</span></div>
+<div class="check-item rv d2"><span class="check-icon">✓</span><span>共享日历、共同清单与每日打卡同步更新</span></div>
 <div class="check-item rv d3"><span class="check-icon">✓</span><span>开屏动画、品牌视觉和情绪化交互，每次打开都有仪式感</span></div>
 <div class="check-item rv d4"><span class="check-icon">✓</span><span>Web、Android 和 Windows 桌面端一致体验，随时随地打开空间</span></div>
 </div></div></div></div></section>
@@ -400,22 +392,21 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <div class="sh rv"><span class="tag">✦ 快速上手</span><h2>三步开启<span class="gt">你们的空间</span></h2><p>开源、可自托管。克隆仓库，配置好环境变量，几分钟就能拥有属于自己的情侣空间。</p></div>
 <div class="steps">
 <div class="step rv d2"><div class="sn">1</div><h3>克隆 & 安装</h3><p>git clone 仓库后运行 npm install，复制 .env.example 为 .env 并填入 Supabase 配置。</p></div>
-<div class="step rv d4"><div class="sn">2</div><h3>初始化数据库</h3><p>使用 Supabase CLI 推送 migrations，部署 Edge Functions 并配置 AI 和通话密钥。</p></div>
+<div class="step rv d4"><div class="sn">2</div><h3>初始化数据库</h3><p>按仓库文档初始化新的 Supabase 数据库，配置认证、存储和账户函数。</p></div>
 <div class="step rv d6"><div class="sn">3</div><h3>启动 & 部署</h3><p>npm run dev 本地预览，npm run generate 生成静态站点，部署到 Cloudflare Pages。</p></div>
 </div></div></section>
 <section id="download"><div class="W">
-<div class="sh rv"><span class="tag">✦ 获取应用</span><h2>选择你的<span class="gt2">使用方式</span></h2><p>网页版即开即用，也可以直接下载客户端获得原生体验。无需访问 GitHub。</p></div>
+<div class="sh rv"><span class="tag">✦ 获取应用</span><h2>选择你的<span class="gt2">使用方式</span></h2><p>可以使用网页端，也可以按仓库说明构建客户端。</p></div>
 <div class="dl-grid">
-<div class="dl-card rv d2"><div class="icon">🌐</div><h3>在线体验</h3><span class="dl-meta">无需安装 · 支持 PWA</span><p>打开浏览器即可使用，还可通过浏览器菜单“安装到主屏幕”像 App 一样打开。</p><a href="https://love-home.pages.dev/" target="_blank" rel="noopener" class="dl-btn">打开网页版 →</a></div>
-<div class="dl-card rv d4"><div class="icon">📱</div><h3>Android APK</h3><span class="dl-meta">v1.0.0 · 约 11 MB · Android 7.0+</span><div class="qr-box" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37" shape-rendering="crispEdges"><path fill="transparent" d="M0 0h37v37H0z"/><path stroke="currentColor" d="M0 0.5h7m1 0h4m2 0h1m2 0h4m2 0h1m6 0h7M0 1.5h1m5 0h1m1 0h1m1 0h1m1 0h1m3 0h2m1 0h4m1 0h1m2 0h1m2 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h1m2 0h3m4 0h2m1 0h2m1 0h2m1 0h1m2 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m2 0h4m1 0h1m2 0h2m2 0h1m1 0h3m2 0h1m1 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h1m1 0h4m4 0h2m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m3 0h1m3 0h2m4 0h1m2 0h1m1 0h2m3 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 7.5h4m3 0h3m2 0h1m1 0h1M0 8.5h1m2 0h6m2 0h1m1 0h2m4 0h1m1 0h3m3 0h1m1 0h1m2 0h1m1 0h3M1 9.5h2m6 0h3m1 0h1m2 0h3m5 0h1m1 0h1m1 0h2m3 0h1m1 0h1M1 10.5h1m2 0h1m1 0h1m1 0h6m1 0h2m2 0h3m1 0h1m10 0h1m1 0h1M0 11.5h4m3 0h3m3 0h1m2 0h2m1 0h1m2 0h1m1 0h1m4 0h8M3 12.5h4m8 0h2m3 0h1m7 0h1m1 0h2m1 0h2m1 0h1M2 13.5h4m1 0h1m1 0h1m1 0h1m1 0h1m1 0h2m1 0h1m2 0h1m1 0h2m1 0h3m3 0h2M1 14.5h1m1 0h1m1 0h3m2 0h1m2 0h1m1 0h1m2 0h2m1 0h2m3 0h4m2 0h3m1 0h1M1 15.5h1m6 0h1m1 0h1m4 0h1m7 0h2m1 0h1m3 0h2m1 0h3M1 16.5h1m1 0h4m1 0h4m2 0h1m2 0h2m2 0h3m2 0h1m2 0h4m1 0h3M1 17.5h1m7 0h3m1 0h1m3 0h1m5 0h7m2 0h2M2 18.5h7m3 0h3m1 0h2m1 0h4m1 0h4m3 0h4m1 0h1M0 19.5h2m3 0h1m1 0h2m1 0h1m2 0h4m1 0h2m2 0h4m1 0h1m1 0h1m1 0h3m2 0h1M0 20.5h1m2 0h2m1 0h2m1 0h1m1 0h1m1 0h2m1 0h2m8 0h1m1 0h6M1 21.5h1m3 0h1m1 0h1m3 0h5m1 0h3m1 0h3m2 0h2m1 0h1m2 0h1m1 0h2M4 22.5h3m2 0h1m1 0h2m2 0h1m4 0h5m2 0h5m1 0h1m2 0h1M0 23.5h2m1 0h1m1 0h1m8 0h1m3 0h8m3 0h8M0 24.5h2m3 0h2m2 0h3m5 0h1m3 0h1m2 0h1m6 0h1m4 0h1M0 25.5h1m2 0h2m3 0h1m2 0h1m1 0h2m2 0h3m2 0h1m1 0h1m1 0h1m1 0h1m2 0h4M0 26.5h2m2 0h3m1 0h3m1 0h4m1 0h1m1 0h1m6 0h2m1 0h2m4 0h2M0 27.5h1m1 0h2m4 0h1m2 0h1m1 0h1m2 0h1m3 0h1m5 0h2m3 0h6M0 28.5h1m1 0h3m1 0h1m3 0h1m3 0h2m3 0h2m1 0h2m1 0h1m2 0h5m1 0h3M8 29.5h1m5 0h2m1 0h1m1 0h1m1 0h2m1 0h1m3 0h1m3 0h1m1 0h2M0 30.5h7m1 0h4m1 0h7m1 0h1m1 0h1m1 0h2m1 0h1m1 0h1m1 0h1m3 0h1M0 31.5h1m5 0h1m1 0h1m2 0h1m1 0h1m1 0h2m3 0h1m1 0h1m5 0h1m3 0h1m2 0h2M0 32.5h1m1 0h3m1 0h1m1 0h4m4 0h1m1 0h7m1 0h7m3 0h1M0 33.5h1m1 0h3m1 0h1m1 0h1m3 0h2m6 0h1m1 0h3m2 0h4m2 0h3M0 34.5h1m1 0h3m1 0h1m2 0h3m7 0h1m1 0h2m2 0h1m3 0h1m2 0h5M0 35.5h1m5 0h1m2 0h1m1 0h1m2 0h2m1 0h1m1 0h1m3 0h1m2 0h2m2 0h1m1 0h5M0 36.5h7m1 0h1m3 0h3m1 0h1m6 0h2m1 0h2m3 0h1m1 0h1m2 0h1"/></svg>
-</div><span class="qr-cap">手机扫码直接下载安装</span><a href="https://love-landing-8s9.pages.dev/downloads/Love%E5%B0%8F%E5%AE%B6-latest.apk" download class="dl-btn gh">下载 APK ↓</a><div class="dl-note">首次安装需允许“未知来源应用” · <a href="#faq">查看安装教程</a></div></div>
-<div class="dl-card rv d6"><div class="icon">💻</div><h3>Windows 桌面版</h3><span class="dl-meta">v1.0.0 · 约 142 MB · Windows 10+ x64</span><p>轻量桌面客户端，独立窗口运行，下载后双击即可安装。</p><a href="https://xthxiazai.oss-cn-beijing.aliyuncs.com/Love小家-Windows-x64.exe" download class="dl-btn gh">下载 EXE ↓</a><div class="dl-note">若 SmartScreen 提示拦截，点“更多信息 → 仍要运行” · <a href="#faq">查看说明</a></div></div>
+<div class="dl-card rv d2"><div class="icon">🌐</div><h3>在线体验</h3><span class="dl-meta">无需安装 · 支持 PWA</span><p>打开浏览器即可使用，还可通过浏览器菜单“安装到主屏幕”像 App 一样打开。</p><a href="/" class="dl-btn">打开网页版 →</a></div>
+<div class="dl-card rv d4"><div class="icon">📱</div><h3>Android APK</h3><span class="dl-meta">Capacitor · 可本地构建</span><p>可在 Windows 运行 <code>npm run android:apk</code> 构建安装包。配置发布后，此处提供下载。</p><a href="/downloads/Love小家-latest.apk" data-apk-download hidden download class="dl-btn pri">下载 APK ↓</a></div>
+<div class="dl-card rv d6"><div class="icon">💻</div><h3>Windows 桌面版</h3><span class="dl-meta">Electron · 可本地构建</span><p>在 Windows 运行 <code>npm run desktop:exe</code> 生成桌面安装包。</p></div>
 </div></div></section>
 <section id="platforms" class="alt"><div class="W">
 <div class="sh rv"><span class="tag">✦ 多端支持</span><h2>随时随地，<span class="gt2">打开你们的空间</span></h2><p>一个项目，三种形态。网页版即开即用，Android 和 Windows 客户端提供原生体验。</p></div>
 <div class="plats">
 <div class="plat rv d2"><div class="pi" style="background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.1);color:var(--v)">🌐</div><h3>Web 网页版</h3><p>基于 Nuxt 4 静态生成，部署到 Cloudflare Pages。PWA 支持安装到主屏幕。</p><span class="badge">即开即用</span></div>
-<div class="plat rv d4"><div class="pi" style="background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.1);color:var(--gn)">📱</div><h3>Android 客户端</h3><p>通过 Capacitor 构建原生 APK，接入系统推送通知和地理位置。</p><span class="badge">APK 构建</span></div>
+<div class="plat rv d4"><div class="pi" style="background:rgba(52,199,89,.06);border:1px solid rgba(52,199,89,.1);color:var(--gn)">📱</div><h3>Android 客户端</h3><p>通过 Capacitor 构建原生 APK，支持录制声音胶囊和本地纪念日提醒。</p><span class="badge">APK 构建</span></div>
 <div class="plat rv d6"><div class="pi" style="background:rgba(0,113,227,.06);border:1px solid rgba(0,113,227,.1);color:var(--bl)">💻</div><h3>Windows 桌面版</h3><p>基于 Electron 的轻量桌面壳，自动加载线上 Web 版本。</p><span class="badge">EXE 安装包</span></div>
 </div></div></section>
 <section id="tech"><div class="W">
@@ -426,24 +417,24 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <div class="tech-item"><span class="dot" style="background:#3178c6"></span>TypeScript</div>
 <div class="tech-item"><span class="dot" style="background:#4285f4"></span>Capacitor</div>
 <div class="tech-item"><span class="dot" style="background:#47848f"></span>Electron</div>
-<div class="tech-item"><span class="dot" style="background:#000"></span>Three.js</div>
+
 <div class="tech-item"><span class="dot" style="background:#88ce02"></span>GSAP</div>
 <div class="tech-item"><span class="dot" style="background:#f5a623"></span>Cloudflare Pages</div>
 </div></div></section>
 <section id="privacy" class="alt"><div class="W">
 <div class="sh rv"><span class="tag">✦ 安全与隐私</span><h2><span class="gt">安全边界</span>是核心设计</h2><p>Love小家处理的是情侣之间的私密数据。安全不是事后补丁，而是从第一行代码就开始的坚持。</p></div>
 <div class="priv-box rv"><div class="priv-grid">
-<div><h3 class="priv-title gt">隐私优先架构</h3><p class="priv-desc">每一层数据访问都经过严格隔离。从数据库行级安全到 AI 密钥管理，全链路保护你们的私密数据。</p></div>
+<div><h3 class="priv-title gt">隐私优先架构</h3><p class="priv-desc">数据库按情侣空间隔离，私密媒体通过短时签名地址读取。</p></div>
 <div class="priv-items">
 <div class="priv-item rv d2"><span class="priv-icon">🔒</span><span>RLS 行级安全策略，数据以 couple_id 为边界隔离</span></div>
 <div class="priv-item rv d3"><span class="priv-icon">🔑</span><span>Storage 签名地址，不暴露公开永久文件 URL</span></div>
 <div class="priv-item rv d4"><span class="priv-icon">🛡️</span><span>敏感密钥只存服务端 Edge Function Secrets</span></div>
-<div class="priv-item rv d5"><span class="priv-icon">🌐</span><span>AI 请求通过服务端转发，浏览器不接触供应商密钥</span></div>
+<div class="priv-item rv d5"><span class="priv-icon">🌐</span><span>账户认证和安全操作通过服务端处理</span></div>
 </div></div>
 <div class="rights rv d6">
 <div class="sh" style="margin:0 0 28px"><span class="tag">✦ 用户权利声明</span></div>
 <div class="rights-grid">
-<div class="right-item"><span class="ri-ic">🗂️</span><div><h4>数据属于你们</h4><p>照片、聊天记录都存储在你指定的数据库中，可以随时导出或删除。</p></div></div>
+<div class="right-item"><span class="ri-ic">🗂️</span><div><h4>数据属于你们</h4><p>共同回忆、相册资料和手写情书可通过账户安全中心导出。</p></div></div>
 <div class="right-item"><span class="ri-ic">🚫</span><div><h4>无广告、无追踪</h4><p>不投放广告、不追踪行为、不出售任何形式的数据。</p></div></div>
 <div class="right-item"><span class="ri-ic">🔍</span><div><h4>完全开源可审计</h4><p>每一行代码都可以被审阅，你的数据如何被处理一清二楚。</p></div></div>
 <div class="right-item"><span class="ri-ic">🏠</span><div><h4>可完全自托管</h4><p>部署到你自己的服务器，从此不依赖任何第三方。</p></div></div>
@@ -453,8 +444,8 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <div class="sh rv"><span class="tag">✦ 使用演示</span><h2>有了这个空间，<span class="gt">日常会变成这样</span></h2><p>以下为想象的使用场景演示，看看用 Love小家记录爱情日常是什么体验。</p></div>
 <div class="tests">
 <div class="test rv d2"><div class="stars">★★★★★</div><p class="text">"终于有一个只属于我们两个人的空间了，不用在海量聊天记录里翻找回忆，所有美好的瞬间都收在这里。"</p><div class="user"><div class="avatar a"></div><div><div class="name">小鱼 & 阿杰</div><div class="rel">在一起 2 年</div></div></div></div>
-<div class="test rv d4"><div class="stars">★★★★★</div><p class="text">"宠物小屋太可爱了！我们每天一起喂宠物，感觉就像真的在养一只属于我们的小动物。"</p><div class="user"><div class="avatar b"></div><div><div class="name">晓晓 & 大伟</div><div class="rel">异地恋 1.5 年</div></div></div></div>
-<div class="test rv d6"><div class="stars">★★★★★</div><p class="text">"AI 写的情书太浪漫了，每次纪念日都能给 TA 一个惊喜。开源项目能做到这种程度真的很厉害。"</p><div class="user"><div class="avatar c"></div><div><div class="name">小雅 & 阿明</div><div class="rel">已婚 3 年</div></div></div></div>
+<div class="test rv d4"><div class="stars">★★★★★</div><p class="text">“睡前两个人都打卡，日历上就多了一天一起坚持的记录。”</p><div class="user"><div class="avatar b"></div><div><div class="name">晓晓 & 大伟</div><div class="rel">异地恋 1.5 年</div></div></div></div>
+<div class="test rv d6"><div class="stars">★★★★★</div><p class="text">“把给 TA 的信放进未来邮箱，等到约好的那天再打开。”</p><div class="user"><div class="avatar c"></div><div><div class="name">小雅 & 阿明</div><div class="rel">已婚 3 年</div></div></div></div>
 </div></div></section>
 <section id="license" class="alt"><div class="W">
 <div class="sh rv"><span class="tag">✦ 开源许可</span><h2><span class="gt">MIT 协议</span> · 永久免费</h2><p>Love小家基于 MIT 协议完全开源，任何人都可以自由地使用、学习和改进。</p></div>
@@ -481,16 +472,16 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <div class="road-grid">
 <div class="road-card rv d2"><div class="road-t"><span>🔜</span>近期计划</div><ul>
 <li>纪念日提醒与倒计时优化</li>
-<li>AI 约会方案与情书更多风格</li>
+<li>暖色主题体验优化</li>
 <li>性能瘦身与加载优化</li>
 </ul></div>
 <div class="road-card rv d4"><div class="road-t"><span>🌱</span>中期探索</div><ul>
 <li>iOS 客户端支持</li>
-<li>悄悄话端到端加密</li>
+<li>私密媒体存储优化</li>
 <li>多语言界面</li>
 </ul></div>
 <div class="road-card rv d6"><div class="road-t"><span>💭</span>长期愿景</div><ul>
-<li>更多 3D 宠物种类与互动玩法</li>
+
 <li>情侣成就与徽章体系</li>
 <li>数据一键导出与迁移</li>
 </ul></div>
@@ -498,19 +489,18 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <section id="faq"><div class="W">
 <div class="sh rv"><span class="tag">✦ 常见问题</span><h2>你可能想知道的</h2><p>关于安装、部署、使用和安全的一些常见问题解答。</p></div>
 <div class="faq-list">
-<div class="faq rv d2"><button type="button" class="faq-q" aria-expanded="false"><span>怎么安装 Android APK？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>点击页面“下载 APK”或用手机扫码下载。首次安装时如系统提示“禁止安装未知来源应用”，进入设置允许本次安装，然后点击下载好的文件即可完成安装。</p></div></div>
+<div class="faq rv d2"><button type="button" class="faq-q" aria-expanded="false"><span>怎么安装 Android APK？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>有已发布的安装包时，点下载链接取得 APK。也可以用仓库的 Android 构建命令生成。首次安装时按 Android 提示允许本次安装。</p></div></div>
 <div class="faq rv d3"><button type="button" class="faq-q" aria-expanded="false"><span>Windows 提示“Windows 已保护你的电脑”怎么办？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>这是 SmartScreen 对未签名应用的常规提示。点击“更多信息”后选择“仍要运行”即可继续安装，安装程序只会写入你选择的目录。</p></div></div>
 <div class="faq rv d4"><button type="button" class="faq-q" aria-expanded="false"><span>登录后为什么还是演示模式？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>检查 .env 中的 Supabase URL 和 anon key，确认部署环境也配置了相同变量，并重新生成静态文件。</p></div></div>
-<div class="faq rv d5"><button type="button" class="faq-q" aria-expanded="false"><span>通话提示 Token 无效怎么办？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>ZEGO 的前端 App ID 不能替代 ServerSecret。请在 Supabase Edge Function Secrets 中配置真实密钥。</p></div></div>
-<div class="faq rv d6"><button type="button" class="faq-q" aria-expanded="false"><span>能不能只用网页，不构建 APK？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>当然可以。运行 npm run generate 后部署 .output/public/ 到静态托管即可。</p></div></div>
-<div class="faq rv d2"><button type="button" class="faq-q" aria-expanded="false"><span>数据存储在哪里？是否安全？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>所有数据存储在你自己配置的 Supabase 项目中，使用 RLS 行级安全策略隔离，可完全自托管。</p></div></div>
-<div class="faq rv d3"><button type="button" class="faq-q" aria-expanded="false"><span>如何贡献代码或提出建议？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>欢迎在 GitHub 提交 Issue 或 Pull Request。Fork 仓库，创建功能分支，保持修改范围清晰即可。</p></div></div>
+<div class="faq rv d5"><button type="button" class="faq-q" aria-expanded="false"><span>能不能只用网页，不构建 APK？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>当然可以。运行 npm run generate 后部署 .output/public/ 到静态托管即可。</p></div></div>
+<div class="faq rv d6"><button type="button" class="faq-q" aria-expanded="false"><span>数据存储在哪里？是否安全？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>所有数据存储在你自己配置的 Supabase 项目中，使用 RLS 行级安全策略隔离，可完全自托管。</p></div></div>
+<div class="faq rv d2"><button type="button" class="faq-q" aria-expanded="false"><span>如何贡献代码或提出建议？</span><span class="faq-a-icon" aria-hidden="true">▾</span></button><div class="faq-ans"><p>欢迎在 GitHub 提交 Issue 或 Pull Request。Fork 仓库，创建功能分支，保持修改范围清晰即可。</p></div></div>
 </div></div></section>
 <section class="cta"><div class="W">
 <h2 class="rv">开始属于你们的<br><span class="gt">故事</span></h2>
 <p class="rv d1">开源、免费、可自托管。今天就开始记录。</p>
 <div class="hact rv d2">
-<a href="https://love-home.pages.dev/" target="_blank" rel="noopener" class="b1">打开在线体验 →</a>
+<a href="/" class="b1">打开在线体验 →</a>
 <a href="https://github.com/XTH-LOVE/Love-" target="_blank" rel="noopener" class="b2">访问 GitHub</a>
 </div></div></section>
 <footer><div class="W footer-inner">
@@ -521,7 +511,7 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <a href="#roadmap">路线图</a>
 <a href="https://github.com/XTH-LOVE/Love-/issues/new" target="_blank" rel="noopener">反馈建议</a>
 <a href="https://github.com/XTH-LOVE/Love-" target="_blank" rel="noopener">GitHub</a>
-<a href="https://love-home.pages.dev/" target="_blank" rel="noopener">在线体验</a>
+<a href="/">在线体验</a>
 <a href="https://github.com/XTH-LOVE/Love-/blob/HEAD/LICENSE" target="_blank" rel="noopener">MIT License</a>
 </div>
 <p class="footer-copy">Love小家 &copy; 2024–2026 · 由 <span class="footer-author">缐廷华</span> 用 ♡ 构建 · <a href="mailto:2678049088@qq.com">2678049088@qq.com</a></p>
@@ -529,6 +519,11 @@ footer{padding:32px 0;border-top:.5px solid var(--bd)}
 <button class="btt" id="btt" aria-label="回到顶部">↑</button>
 <script>
 document.documentElement.classList.add('js-ready');
+const apkLink=document.querySelector('[data-apk-download]');
+if(apkLink)fetch(apkLink.href,{method:'HEAD'}).then(response=>{
+  const contentType=response.headers.get('content-type')?.split(';')[0];
+  if(response.ok&&['application/vnd.android.package-archive','application/octet-stream'].includes(contentType))apkLink.hidden=false;
+}).catch(()=>{});
 // Theme toggle (icon follows data-theme via CSS)
 document.getElementById('themeToggle').addEventListener('click',()=>{
   const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';

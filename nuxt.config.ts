@@ -29,9 +29,7 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: [
         '@capacitor/core',
-        '@capacitor/geolocation',
         '@capacitor/local-notifications',
-        '@capacitor/push-notifications',
         '@capacitor/splash-screen',
         '@capacitor/status-bar',
           '@lucide/vue',
@@ -45,7 +43,6 @@ export default defineNuxtConfig({
         '@uppy/core',
         '@uppy/golden-retriever',
         'tus-js-client',
-        'zego-express-engine-webrtc',
         '@vue/devtools-core',
         '@vue/devtools-kit',
       ],
@@ -55,19 +52,9 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
-      zegoAppId: process.env.NUXT_PUBLIC_ZEGO_APP_ID || '1477734707',
-      // Let ZEGO SDK 3.7+ discover the current access server from the AppID
-      // when no console-provided URL is configured.
-      zegoServer: process.env.NUXT_PUBLIC_ZEGO_SERVER || '',
-      amapKey: process.env.NUXT_PUBLIC_AMAP_KEY || '',
-      amapSecurityCode: process.env.NUXT_PUBLIC_AMAP_SECURITY_CODE || '',
       appVersion: process.env.NUXT_PUBLIC_APP_VERSION || packageJson.version,
       appBuild: process.env.NUXT_PUBLIC_APP_BUILD || 'local',
-      updateManifestUrl: process.env.NUXT_PUBLIC_UPDATE_MANIFEST_URL || 'https://love-home.pages.dev/app-update.json',
-      // Capacitor PushNotifications requires Firebase initialization on Android.
-      // Keep it opt-in so a build without google-services.json cannot crash
-      // after login when PushNotifications.register() is invoked.
-      pushNotificationsEnabled: process.env.NUXT_PUBLIC_PUSH_NOTIFICATIONS_ENABLED === 'true',
+      updateManifestUrl: process.env.NUXT_PUBLIC_UPDATE_MANIFEST_URL || '/app-update.json',
     },
   },
   nitro: {

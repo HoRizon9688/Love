@@ -4,7 +4,7 @@ import { restorePersistedJobs, restoredJobPatch, uploadQueueStorageKey } from '~
 
 export type UploadJobStatus = 'queued' | 'uploading' | 'retrying' | 'paused' | 'completed' | 'failed'
 export type UploadOperation = {
-  kind: 'album' | 'memory' | 'message' | 'avatar' | 'other'
+  kind: 'album' | 'memory' | 'avatar' | 'voice-capsule' | 'other'
   coupleId?: string
   albumId?: string
   takenDate?: string

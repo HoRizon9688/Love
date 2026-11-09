@@ -1,4 +1,4 @@
-const VERSION = 'love-home-shell-v2'
+const VERSION = 'love-home-shell-v3'
 const CORE_ASSETS = [
   '/manifest.webmanifest',
   '/couplespace-mark.svg',

@@ -50,7 +50,7 @@ function shortText(value: string, fallback: string) {
 }
 
 function uploadBody(job: UploadJob) {
-  if (job.status === 'failed') return `${job.name} 上传失败，点击进入相册重试。`
+  if (job.status === 'failed') return `${job.name} 上传失败，点击查看。`
   if (job.status === 'completed') return `${job.name} 已完成上传。`
   return `${job.name} 正在上传，当前进度 ${job.progress}%。`
 }
@@ -117,9 +117,10 @@ export function useNotificationCenter() {
         result.push({ id, type: 'anniversary', title: event.title, body: daysUntil(event) === 0 ? '就是今天，记得给 TA 一个拥抱。' : `还有 ${daysUntil(event)} 天，一起期待这个特别的日子。`, createdAt: new Date().toISOString(), target: '纪念日', read: isRead(id) })
       })
 
-    jobs.value.filter(job => job.operation?.kind !== 'message' && ['failed', 'uploading', 'retrying', 'paused'].includes(job.status)).slice(-6).reverse().forEach(job => {
+    jobs.value.filter(job => ['failed', 'uploading', 'retrying', 'paused'].includes(job.status)).slice(-6).reverse().forEach(job => {
       const id = `upload:${job.id}`
-      result.push({ id, type: 'upload', title: job.status === 'failed' ? '上传失败' : '上传进行中', body: uploadBody(job), createdAt: job.createdAt, target: job.operation?.kind === 'memory' ? '时光' : '相册', read: isRead(id) })
+      const target = job.operation?.kind === 'voice-capsule' ? '声音胶囊' : job.operation?.kind === 'memory' ? '时光' : '相册'
+      result.push({ id, type: 'upload', title: job.status === 'failed' ? '上传失败' : '上传进行中', body: uploadBody(job), createdAt: job.createdAt, target, read: isRead(id) })
     })
 
     return result.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))

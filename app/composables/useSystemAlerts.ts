@@ -17,7 +17,7 @@ export async function requestSystemAlerts() {
       await LocalNotifications.createChannel({
         id: 'love-home-alerts',
         name: 'Love小家通知',
-        description: '悄悄话和来电提醒',
+        description: '纪念日和共同日程提醒',
         importance: 5,
         sound: 'default',
         vibration: true,

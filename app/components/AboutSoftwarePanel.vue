@@ -11,9 +11,9 @@ const buildTarget = computed(() => import.meta.client
   : 'Web / Android / Windows')
 const buildDate = '2026.07'
 const releaseNotes = [
-  '统一通知中心：悄悄话、通话、纪念日、火花和上传状态集中提醒',
+  '统一通知中心：纪念日、共同动态和上传状态集中提醒',
   '媒体体验升级：缩略图优先、视频封面、断网恢复和失败重试',
-  '情侣空间升级：共同回忆、宠物互动、AI 日记与情书持续完善',
+  '情侣空间升级：双人打卡、共同回忆、手写情书和声音胶囊',
 ]
 
 async function checkUpdates() {
@@ -46,7 +46,7 @@ function openGithub() {
 
       <section class="about-intro">
         <div class="about-intro-icon"><Heart :size="18" fill="currentColor" /></div>
-        <div><h3>只属于你们的双人空间</h3><p>Love小家是一款面向情侣的私密陪伴软件。它把共同回忆、即时沟通、纪念日、清单、宠物和 AI 灵感放在一个安静、可靠的空间里。</p></div>
+        <div><h3>只属于你们的双人空间</h3><p>Love小家把共同回忆、双人打卡、纪念日、清单和写给对方的信收在一起。</p></div>
       </section>
 
       <div class="about-grid">
@@ -60,9 +60,9 @@ function openGithub() {
         <div class="about-section-title"><div><p class="eyebrow">PRODUCT SCOPE</p><h3>我们正在认真做什么</h3></div><span class="about-status"><i /> 稳定运行</span></div>
         <div class="about-feature-grid">
           <article><Heart :size="15" /><div><strong>共同回忆</strong><p>照片、视频、时光记录和最近回忆统一沉淀。</p></div></article>
-          <article><LockKeyhole :size="15" /><div><strong>私密沟通</strong><p>悄悄话、语音、位置和通话仅限情侣空间成员。</p></div></article>
-          <article><RefreshCw :size="15" /><div><strong>实时同步</strong><p>消息、在线状态、火花与通知尽量保持实时。</p></div></article>
-          <article><Info :size="15" /><div><strong>长期记录</strong><p>纪念日、共同清单、宠物成长和 AI 内容可持续保存。</p></div></article>
+          <article><LockKeyhole :size="15" /><div><strong>私密记录</strong><p>情书、未来邮箱和声音胶囊仅供空间成员使用。</p></div></article>
+          <article><RefreshCw :size="15" /><div><strong>实时同步</strong><p>双人打卡、在线状态与共同活动实时更新。</p></div></article>
+          <article><Info :size="15" /><div><strong>长期记录</strong><p>一起保存纪念日、共享日程和共同清单。</p></div></article>
         </div>
       </section>
 
@@ -77,9 +77,9 @@ function openGithub() {
       </section>
       <p v-if="checkMessage" class="check-message"><Check :size="14" /> {{ checkMessage }} <button v-if="manifest" type="button" @click="openUpdate">立即更新</button></p>
 
-      <details class="about-details" open><summary><ShieldCheck :size="16" /> 隐私与安全</summary><p>我们只使用实现情侣空间所需的数据。照片、视频和消息默认属于你们的私密内容，请不要把邀请码或登录凭据分享给他人。</p></details>
-      <details class="about-details"><summary><Database :size="16" /> 数据如何被使用</summary><p>账号信息用于登录和情侣空间成员识别；照片、视频和消息用于在双方设备间同步；通知和上传状态用于提醒和恢复任务。删除账户或退出情侣空间后，相关数据会按服务端规则处理。</p></details>
-      <details class="about-details"><summary><Info :size="16" /> 服务边界与可用性</summary><p>Love小家依赖 Supabase 存储与实时服务、浏览器或系统通知能力，以及通话服务商。网络、设备权限或第三方服务异常时，部分功能可能暂时不可用；软件会尽量保留本地状态并提供重试。</p></details>
+      <details class="about-details" open><summary><ShieldCheck :size="16" /> 隐私与安全</summary><p>照片、视频、情书和录音属于你们的私密内容。邀请码和登录凭据只应交给可信的人。</p></details>
+      <details class="about-details"><summary><Database :size="16" /> 数据如何被使用</summary><p>账号信息用于登录和识别空间成员。照片、视频和录音可以在双方设备间同步。通知和上传状态用于提醒和恢复任务。删除账户或退出空间后，相关数据会按服务端规则处理。</p></details>
+      <details class="about-details"><summary><Info :size="16" /> 服务边界与可用性</summary><p>Love小家使用 Supabase 存储与实时服务，以及浏览器或系统提供的本地通知。网络或设备权限异常时，部分功能可能暂时不可用。</p></details>
       <details class="about-details"><summary><Scale :size="16" /> 服务与开源许可</summary><p>本软件由缐廷华开发维护，部分能力使用 Supabase、Nuxt、Vue、Lucide 等开源项目。第三方服务的可用性以其服务条款为准。</p></details>
       <details class="about-details"><summary><GitFork :size="16" /> 项目与反馈</summary><p>项目地址：<button class="inline-link" type="button" @click="openGithub">github.com/XTH-LOVE/Love-</button></p></details>
       <footer><strong>Love小家</strong><span>由缐廷华开发维护 · 构建于 {{ buildDate }}</span><small>感谢你们把平凡的日子，过成值得收藏的故事。</small></footer>

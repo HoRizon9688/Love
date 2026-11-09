@@ -15,7 +15,7 @@ const stateLabel: Record<string, string> = { checking: '检查中', ok: '正常'
 const serviceRows: Array<{ key: SpaceServiceKey; label: string; icon: any }> = [
   { key: 'supabase', label: 'Supabase 数据库', icon: Database },
   { key: 'media', label: '私有图片服务', icon: Image },
-  { key: 'push', label: '系统推送通知', icon: BellRing },
+  { key: 'notifications', label: '本地通知权限', icon: BellRing },
 ]
 const syncLabel = computed(() => {
   if (!lastSyncAt.value) return '尚未同步'

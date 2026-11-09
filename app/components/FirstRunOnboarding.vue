@@ -26,7 +26,7 @@ const emit = defineEmits<{
 
 const page = ref(0)
 const introPages = [
-  { icon: Heart, title: '只属于你们的双人空间', body: '把照片、视频、悄悄话、纪念日和共同计划，收进一个只有你们能看见的小家。' },
+  { icon: Heart, title: '只属于你们的双人空间', body: '把照片、视频、纪念日和共同计划，收进一个只有你们能看见的小家。' },
   { icon: Image, title: '每个瞬间，都值得保存', body: '从第一张共同照片开始，让时光轴和相册慢慢长成你们的故事。' },
   { icon: BellRing, title: '重要日子，不再错过', body: '纪念日可以安排系统提醒，Android、桌面端和网页都能收到通知。' },
 ]

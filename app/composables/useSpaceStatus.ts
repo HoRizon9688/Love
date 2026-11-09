@@ -1,19 +1,19 @@
 import { reactive, ref } from 'vue'
 
-export type SpaceServiceKey = 'supabase' | 'media' | 'push'
+export type SpaceServiceKey = 'supabase' | 'media' | 'notifications'
 export type SpaceServiceState = 'checking' | 'ok' | 'warning' | 'error' | 'offline'
 export type SpaceService = { state: SpaceServiceState; detail: string }
 
 const services = reactive<Record<SpaceServiceKey, SpaceService>>({
   supabase: { state: 'checking', detail: '等待检查' },
   media: { state: 'checking', detail: '等待检查' },
-  push: { state: 'checking', detail: '等待检查' },
+  notifications: { state: 'checking', detail: '等待检查' },
 })
 const networkOnline = ref(true)
 const lastSyncAt = ref('')
 let listenersReady = false
 
-function withTimeout<T>(promise: Promise<T>, timeout = 8000) {
+function withTimeout<T>(promise: PromiseLike<T>, timeout = 8000) {
   return Promise.race([promise, new Promise<T | null>(resolve => globalThis.setTimeout(() => resolve(null), timeout))])
 }
 
@@ -32,16 +32,16 @@ function setupNetworkListeners() {
   try { lastSyncAt.value = window.localStorage.getItem('couple-space-last-sync-at') || '' } catch {}
 }
 
-async function checkPushPermission() {
+async function checkNotificationPermission() {
   if (!import.meta.client) return { state: 'checking' as const, detail: '等待浏览器加载' }
   try {
     const { Capacitor } = await import('@capacitor/core')
-    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
-      const { PushNotifications } = await import('@capacitor/push-notifications')
-      const permission = await PushNotifications.checkPermissions()
-      if (permission.receive === 'granted') return { state: 'ok' as const, detail: 'Android 推送权限已开启' }
-      if (permission.receive === 'denied') return { state: 'error' as const, detail: '系统已拒绝推送权限' }
-      return { state: 'warning' as const, detail: '尚未允许 Android 推送' }
+    if (Capacitor.isNativePlatform()) {
+      const { LocalNotifications } = await import('@capacitor/local-notifications')
+      const permission = await LocalNotifications.checkPermissions()
+      if (permission.display === 'granted') return { state: 'ok' as const, detail: '本地通知权限已开启' }
+      if (permission.display === 'denied') return { state: 'error' as const, detail: '系统已拒绝本地通知权限' }
+      return { state: 'warning' as const, detail: '尚未允许本地通知' }
     }
   } catch {}
   if (typeof Notification === 'undefined') return { state: 'warning' as const, detail: '当前环境不支持系统通知' }
@@ -59,12 +59,12 @@ export function useSpaceStatus() {
     if (!networkOnline.value) {
       services.supabase = { state: 'offline', detail: '设备当前处于离线状态' }
       services.media = { state: 'offline', detail: '等待网络恢复' }
-      services.push = await checkPushPermission()
+      services.notifications = await checkNotificationPermission()
       return
     }
     services.supabase = { state: 'checking', detail: '正在检查数据库连接' }
     services.media = { state: 'checking', detail: '正在检查私有图片服务' }
-    services.push = await checkPushPermission()
+    services.notifications = await checkNotificationPermission()
     if (!$supabase || demoMode.value) {
       services.supabase = { state: 'warning', detail: '当前为本地演示模式' }
       services.media = { state: 'warning', detail: '演示媒体保存在本机' }

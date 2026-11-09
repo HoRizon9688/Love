@@ -1,4 +1,5 @@
 import { createMediaSignedUrl } from './useMediaUrls'
+import { redactHistoricalLocations } from '~/utils/historicalMessages'
 
 export type LoginDevice = { name: string; detail: string; current: boolean; lastSeen: string }
 
@@ -36,11 +37,16 @@ export function useAccountSecurity() {
   async function exportData() {
     if (!$supabase || demoMode.value) {
       downloadJson(`love-home-export-${new Date().toISOString().slice(0, 10)}.json`, {
-        exportedAt: new Date().toISOString(), memories: JSON.parse(localStorage.getItem('couple-space-memories') || '[]'), messages: JSON.parse(localStorage.getItem('couple-space-messages') || '[]'), albums: JSON.parse(localStorage.getItem('couple-space-albums') || '[]'), photos: JSON.parse(localStorage.getItem('couple-space-album-photos') || '[]'),
+        exportedAt: new Date().toISOString(),
+        memories: JSON.parse(localStorage.getItem('couple-space-memories') || '[]'),
+        messages: redactHistoricalLocations(JSON.parse(localStorage.getItem('couple-space-messages') || '[]')),
+        albums: JSON.parse(localStorage.getItem('couple-space-albums') || '[]'),
+        photos: JSON.parse(localStorage.getItem('couple-space-album-photos') || '[]'),
       })
       return
     }
     working.value = true; error.value = ''
+    const supabase = $supabase
     try {
       const coupleId = profile.value?.coupleId
       if (!coupleId) throw new Error('请先进入情侣空间')
@@ -48,7 +54,7 @@ export function useAccountSecurity() {
         const rows: any[] = []
         const pageSize = 500
         for (let offset = 0; ; offset += pageSize) {
-          const result = await $supabase.from(table).select(select).eq('couple_id', coupleId).order(orderColumn, { ascending: true }).range(offset, offset + pageSize - 1)
+          const result = await supabase.from(table).select(select).eq('couple_id', coupleId).order(orderColumn, { ascending: true }).range(offset, offset + pageSize - 1)
           if (result.error) {
             if (isMissingRelation(result.error)) return []
             throw result.error
@@ -67,7 +73,7 @@ export function useAccountSecurity() {
         const rows: any[] = []
         const pageSize = 500
         for (let offset = 0; ; offset += pageSize) {
-          const result = await $supabase.rpc(name).range(offset, offset + pageSize - 1)
+          const result = await supabase.rpc(name).range(offset, offset + pageSize - 1)
           if (result.error) {
             if (isMissingRelation(result.error)) return []
             throw result.error
@@ -76,20 +82,16 @@ export function useAccountSecurity() {
           if (!result.data || result.data.length < pageSize) return rows
         }
       }
-      const [memories, messages, albums, works, letters, moodCheckins, dailyQuestions, dailyAnswers, sharedEvents, musicRoomMessages, listeningSessions, voiceCapsules, callRecords, streakActions, storyLinks, futureLetters] = await Promise.all([
+      const [memories, messages, albums, letters, moodCheckins, dailyQuestions, dailyAnswers, sharedEvents, voiceCapsules, streakActions, storyLinks, futureLetters] = await Promise.all([
         fetchPaged('memories'),
         fetchPaged('messages', 'id,sender_id,content,media_path,media_type,media_poster_path,created_at,read_at'),
         fetchPaged('albums'),
-        fetchPaged('ai_saved_works'),
         fetchPaged('couple_letters'),
         fetchOptionalPaged('mood_checkins', '*', 'mood_date'),
         fetchOptionalPaged('daily_questions', '*', 'question_date'),
         fetchOptionalPaged('daily_answers'),
         fetchOptionalPaged('shared_events', '*', 'event_date'),
-        fetchOptionalPaged('music_room_messages'),
-        fetchOptionalPaged('listening_sessions', '*', 'updated_at'),
         fetchOptionalPaged('voice_capsules'),
-        fetchOptionalPaged('call_records', '*', 'started_at'),
         fetchOptionalPaged('streak_day_actions', '*', 'activity_date'),
         fetchOptionalPaged('story_share_links'),
         fetchPagedRpc('get_future_letters'),
@@ -106,7 +108,6 @@ export function useAccountSecurity() {
         ...(memories || []).flatMap((item: any) => (Array.isArray(item.photos) ? item.photos : []).flatMap((photo: any) => [photo.path, photo.thumbPath, photo.mediumPath, photo.originalPath].filter(Boolean).map((path: string) => ({ bucket: 'memory-photos', path })))),
         ...photos.flatMap((item: any) => [item.path, item.thumb_path, item.medium_path, item.original_path, item.video_poster_path].filter(Boolean).map((path: string) => ({ bucket: 'album-media', path }))),
         ...(messages || []).flatMap((item: any) => [item.media_path, item.media_poster_path].filter(Boolean).map((path: string) => ({ bucket: 'message-media', path }))),
-        ...(musicRoomMessages || []).filter((item: any) => item.audio_path).map((item: any) => ({ bucket: 'message-media', path: item.audio_path })),
         ...(voiceCapsules || []).filter((item: any) => item.audio_path).map((item: any) => ({ bucket: 'message-media', path: item.audio_path })),
       ].filter(item => item.path)
       const media = await Promise.all(mediaPaths.map(async item => ({ ...item, url: await createMediaSignedUrl($supabase, item.path, item.bucket) })))
@@ -114,20 +115,16 @@ export function useAccountSecurity() {
         exportedAt: new Date().toISOString(),
         profile: profile.value,
         memories,
-        messages,
+        messages: redactHistoricalLocations(messages),
         albums,
         albumPhotos: photos,
-        aiWorks: works,
         letters,
         moodCheckins,
         dailyQuestions,
         dailyAnswers,
         sharedEvents,
-        musicRoomMessages,
-        listeningSessions,
         voiceCapsules,
         futureLetters,
-        callRecords,
         streakActions,
         storyLinks,
         media,

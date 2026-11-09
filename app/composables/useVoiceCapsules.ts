@@ -103,7 +103,7 @@ export function useVoiceCapsules() {
         const result = await uploadMediaResumable($supabase, 'message-media', path, input.file, value => { uploadProgress.value = value; setProgress(value) })
         if (result.error) throw result.error
         return path
-      }, { kind: 'message', coupleId: profile.value.coupleId, mediaType: 'audio' })
+      }, { kind: 'voice-capsule', coupleId: profile.value.coupleId, mediaType: 'audio' })
       const { data, error: insertError } = await $supabase.from('voice_capsules').insert({
         couple_id: profile.value.coupleId,
         author_id: profile.value.id,

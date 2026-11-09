@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "love-home-media",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-09",
+  "vars": {
+    "SUPABASE_URL": "https://your-project.supabase.co",
+    "SUPABASE_PUBLIC_KEY": "replace-with-your-publishable-or-anon-key",
+    "R2_ACCOUNT_ID": "replace-with-your-account-id",
+    "R2_BUCKET_NAME": "love-home-media-private",
+    "ALLOWED_ORIGINS": "https://your-app.example,capacitor://localhost,https://localhost"
+  },
+  "r2_buckets": [
+    {
+      "binding": "MEDIA_BUCKET",
+      "bucket_name": "love-home-media-private"
+    }
+  ],
+  "triggers": { "crons": ["*/15 * * * *"] },
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "invocation_logs": false },
+    "traces": { "enabled": true }
+  }
+}

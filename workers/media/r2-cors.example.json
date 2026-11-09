@@ -1,0 +1,9 @@
+[
+  {
+    "AllowedOrigins": ["https://your-app.example", "capacitor://localhost", "https://localhost"],
+    "AllowedMethods": ["PUT", "GET", "HEAD"],
+    "AllowedHeaders": ["Content-Type", "Cache-Control", "If-None-Match", "Range"],
+    "ExposeHeaders": ["Accept-Ranges", "Content-Range", "Content-Length", "ETag"],
+    "MaxAgeSeconds": 300
+  }
+]

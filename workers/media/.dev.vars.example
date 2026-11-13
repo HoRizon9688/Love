@@ -1,0 +1,10 @@
+# Copy this file to .dev.vars locally. The real file is ignored by Git.
+# Use values from the new, dedicated test project and private test bucket.
+SUPABASE_URL="https://replace-project-ref.supabase.co"
+SUPABASE_PUBLIC_KEY="replace-with-test-project-publishable-key"
+SUPABASE_SERVICE_KEY="replace-with-test-project-secret-key"
+R2_ACCOUNT_ID="replace-with-cloudflare-account-id"
+R2_BUCKET_NAME="love-home-media-test"
+R2_ACCESS_KEY_ID="replace-with-bucket-scoped-access-key-id"
+R2_SECRET_ACCESS_KEY="replace-with-bucket-scoped-secret-access-key"
+ALLOWED_ORIGINS="http://127.0.0.1:3200,http://localhost:3200,capacitor://localhost,https://localhost"

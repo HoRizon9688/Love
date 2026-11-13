@@ -36,7 +36,7 @@ jobs:
           npm run typecheck --prefix workers/media
 
       - name: TypeScript check
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Generate production site
         run: npm run generate

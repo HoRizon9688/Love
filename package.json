@@ -17,6 +17,7 @@
     "desktop:dev": "electron desktop/main.cjs",
     "desktop:exe": "electron-builder --win nsis",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit -p .nuxt/tsconfig.app.json && tsc --noEmit -p .nuxt/tsconfig.server.json && tsc --noEmit -p .nuxt/tsconfig.shared.json && tsc --noEmit -p .nuxt/tsconfig.node.json",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "postinstall": "node scripts/patch-lucide-context.cjs && nuxt prepare"

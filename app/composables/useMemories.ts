@@ -51,7 +51,13 @@ export function useMemories() {
   function loadDemo() {
     const saved = localStorage.getItem('couple-space-memories')
     const rows = saved ? JSON.parse(saved) : demoSeed
-    memories.value = (Array.isArray(rows) ? rows : []).map((memory: Memory) => ({ favoriteCount: 0, isFavorite: false, reactions: {}, comments: [], ...memory }))
+    memories.value = (Array.isArray(rows) ? rows : []).map((memory: Memory) => ({
+      ...memory,
+      favoriteCount: memory.favoriteCount ?? 0,
+      isFavorite: memory.isFavorite ?? false,
+      reactions: memory.reactions ?? {},
+      comments: memory.comments ?? [],
+    }))
     memoriesLoaded.value = true
   }
 

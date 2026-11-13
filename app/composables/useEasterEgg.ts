@@ -88,7 +88,8 @@ export function useEasterEgg() {
     if (!input.content.trim()) throw new Error('请写下彩蛋内容')
     busy.value = true; error.value = ''
     try {
-      const payload = { title: input.title.trim() || '只属于我们的秘密', content: input.content.trim(), mediaPath: input.mediaPath || '', mediaType: input.mediaType || '', mediaUrl: input.mediaUrl || '', audioPath: input.audioPath || '', audioUrl: input.audioUrl || '' }
+      const mediaType: EasterEgg['mediaType'] = input.mediaType || ''
+      const payload = { title: input.title.trim() || '只属于我们的秘密', content: input.content.trim(), mediaPath: input.mediaPath || '', mediaType, mediaUrl: input.mediaUrl || '', audioPath: input.audioPath || '', audioUrl: input.audioUrl || '' }
       if (!$supabase || demoMode.value) {
         const item: EasterEgg = { id: crypto.randomUUID(), createdBy: profile.value?.id || 'demo-user', secretHash, ...payload, mediaUrl: '', audioUrl: '', createdAt: new Date().toISOString() }
         egg.value = item

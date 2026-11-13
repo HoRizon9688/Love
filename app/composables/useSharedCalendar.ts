@@ -197,9 +197,9 @@ export function useSharedCalendar() {
     error.value = ''
     try {
       if (!$supabase || demoMode.value) {
-        const idx = events.value.findIndex(e => e.id === id)
-        if (idx < 0) throw new Error('事件不存在')
-        Object.assign(events.value[idx], updates)
+        const event = events.value.find(e => e.id === id)
+        if (!event) throw new Error('事件不存在')
+        Object.assign(event, updates)
         localStorage.setItem(storageKey(profile.value?.coupleId || 'demo'), JSON.stringify(events.value))
         return
       }
@@ -219,8 +219,8 @@ export function useSharedCalendar() {
 
       const { error: updateError } = await $supabase.from('shared_events').update(dbUpdates).eq('id', id)
       if (updateError) throw updateError
-      const idx = events.value.findIndex(e => e.id === id)
-      if (idx >= 0) Object.assign(events.value[idx], updates)
+      const event = events.value.find(e => e.id === id)
+      if (event) Object.assign(event, updates)
     } catch (cause: any) {
       error.value = cause?.message || '更新失败'
       throw cause

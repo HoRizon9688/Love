@@ -51,7 +51,7 @@ const DEFAULT_QUESTIONS = [
   '你最近读的一本书或看的一部剧是什么？',
   '你觉得我最让你惊喜的是什么？',
   '你最喜欢我们一起做的什么事？',
-]
+] as const
 
 const todayQuestion = ref<DailyQuestionWithAnswers | null>(null)
 const recentQuestions = ref<DailyQuestionWithAnswers[]>([])
@@ -91,7 +91,7 @@ export function useDailyQuestions() {
 
   function getQuestionForDate(dateStr: string): string {
     const dayOfYear = Math.floor((Date.parse(dateStr) - Date.parse(dateStr.slice(0, 4) + '-01-01')) / 86400000)
-    return DEFAULT_QUESTIONS[dayOfYear % DEFAULT_QUESTIONS.length]
+    return DEFAULT_QUESTIONS[dayOfYear % DEFAULT_QUESTIONS.length] ?? DEFAULT_QUESTIONS[0]
   }
 
   async function load() {
